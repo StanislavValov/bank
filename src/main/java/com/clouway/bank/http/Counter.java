@@ -1,4 +1,4 @@
-package com.clouway.bank;
+package com.clouway.bank.http;
 
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -13,14 +13,14 @@ public class Counter implements HttpSessionListener {
   @Override
   public void sessionCreated(HttpSessionEvent httpSessionEvent) {
     activeSessions++;
-    httpSessionEvent.getSession().getServletContext().setAttribute("counter",activeSessions);
+    httpSessionEvent.getSession().setAttribute("counter",activeSessions);
   }
 
   @Override
   public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
     if (activeSessions > 0) {
       activeSessions--;
-      httpSessionEvent.getSession().getServletContext().setAttribute("counter", activeSessions);
+      httpSessionEvent.getSession().setAttribute("counter",activeSessions);
     }
   }
 }

@@ -1,4 +1,4 @@
-package com.clouway.bank;
+package com.clouway.bank.http;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
@@ -28,11 +28,9 @@ public class ConnectionPerRequestFilter implements Filter {
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     dataSource.setUser("root");
-    dataSource.setPassword("toor");
-    dataSource.setDatabaseName("Bank");
+    dataSource.setPassword("clouway.com");
+    dataSource.setDatabaseName("bank");
     dataSource.setServerName("localhost");
-
-
   }
 
   private Connection getConnection() throws SQLException {

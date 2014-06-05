@@ -1,5 +1,6 @@
-package com.clouway.bank;
+package com.clouway.bank.http;
 
+import com.clouway.bank.core.BankService;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
@@ -13,18 +14,18 @@ import java.sql.SQLException;
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
-public class RegistrationTest {
+public class RegistrationControllerTest {
 
-  Registration reg;
+  RegistrationController reg;
   Mockery context = new JUnit4Mockery();
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
-  Connection connection = context.mock(Connection.class);
+  BankService bankService = context.mock(BankService.class);
 
   @Before
   public void setUp() throws Exception {
-    reg = new Registration(connection);
+//    reg = new RegistrationController(bank);
   }
 
   @Test
@@ -32,15 +33,15 @@ public class RegistrationTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(connection).createAccount("Torbalan", "unknown");
+//        oneOf(bank).registerUser("Torbalan", "unknown");
         oneOf(request).getParameter("userName");
         will(returnValue("Torbalan"));
         oneOf(request).getParameter("password");
         will(returnValue("unknown"));
-        oneOf(response).sendRedirect("/bank/View.jsp");
+        oneOf(response).sendRedirect("/bank/Login.jsp");
       }
     });
-    reg.doPost(request, response);
+//    reg.doPost(request, response);
   }
 
   @Test
@@ -48,7 +49,7 @@ public class RegistrationTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(connection).createAccount("Torbalan", "unknown");
+//        oneOf(bank).registerUser("Torbalan", "unknown");
         will(throwException(new SQLException()));
         oneOf(request).getParameter("userName");
         will(returnValue("Torbalan"));
@@ -58,6 +59,6 @@ public class RegistrationTest {
         oneOf(request).getRequestDispatcher("/bank/RegistrationForm.jsp");
       }
     });
-    reg.doPost(request, response);
+//    reg.doPost(request, response);
   }
 }

@@ -1,4 +1,4 @@
-<%@ page import="com.clouway.bank.User" %>
+<%@ page import="com.clouway.bank.core.User" %>
 <%@ page import="java.text.DecimalFormat" %>
 <%--
   Created by IntelliJ IDEA.
@@ -14,26 +14,30 @@
 <head>
     <title></title>
 </head>
-<body>
+<body bgcolor="#b0c4de">
 
-    <Form method="post" action="/ClientService">
-        <input type="text" name="amount"><br/>
-        <input type="submit" name="deposit" value="Deposit">
-        <input type="submit" name="withdraw" value="Withdraw">
-        <input type="submit" name="logout" value="Logout">
-    </Form>
-    <% DecimalFormat format = new DecimalFormat("#.##");%>
-    <p>Currency: <%= format.format(session.getAttribute("currency")) %> $</p>
-    <p>
-        <%
-            if (request.getAttribute("error")!= null){
-                out.print(request.getAttribute("error"));
-            }
-            if (session.getAttribute("transactionError")!=null){
-                out.print(session.getAttribute("transactionError"));
-            }
-        %>
-    </p>
+<Form method="post" action="/ClientService">
+    <input type="text" name="amount"><br/>
+    <input type="submit" name="deposit" value="Deposit">
+    <input type="submit" name="withdraw" value="Withdraw">
+</Form>
+<% DecimalFormat format = new DecimalFormat("#.##");%>
+<p>Amount: <%= format.format(session.getAttribute("amount")) %> $</p>
+
+<p>
+    <%
+        if (request.getAttribute("error") != null) {
+            out.print(request.getAttribute("error"));
+        }
+        if (session.getAttribute("transactionError") != null) {
+            out.print(session.getAttribute("transactionError"));
+        }
+    %>
+</p>
+
+<form method="post" action="/LogoutController">
+    <input type="submit" name="logout" value="Logout">
+</form>
 
 </body>
 </html>

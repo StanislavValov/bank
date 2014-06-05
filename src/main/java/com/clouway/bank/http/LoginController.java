@@ -1,5 +1,7 @@
-package com.clouway.bank;
+package com.clouway.bank.http;
 
+import com.clouway.bank.core.AccountService;
+import com.clouway.bank.core.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -14,30 +16,30 @@ import java.io.IOException;
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @Singleton
-public class LoginController extends HttpServlet  {
+public class LoginController extends HttpServlet {
 
-  private Connection connection;
+  private AccountService accountService;
+  private User user;
 
   @Inject
-  public LoginController(Connection connection) {
-    this.connection = connection;
+  public LoginController(AccountService accountService, User user) {
+    this.accountService = accountService;
+    this.user = user;
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     HttpSession session = req.getSession();
-    User user = new User();
-
     user.setUserName(req.getParameter("userName"));
     user.setPassword(req.getParameter("password"));
+//    Cookie userId = new Cookie("id",new Security().idGenerator());
 
-    if (user.getPassword().equals(connection.getPassword(user.getUserName()))) {
+    if (user.getPassword().equals(accountService.getPassword(user))) {
       session.setAttribute("userName", user.getUserName());
-      session.setAttribute("currency", connection.getCurrency(user.getUserName()));
-      req.getRequestDispatcher("/bank/User.jsp").forward(req, resp);
+      req.getRequestDispatcher("/UserAccountController").forward(req, resp);
     } else {
-      req.setAttribute("error", "Wrong Password or Username");
-      req.getRequestDispatcher("/bank/View.jsp").forward(req, resp);
+      session.setAttribute("error", "Wrong Password or Username");
+      resp.sendRedirect("/bank/Login.jsp");
     }
   }
 }
