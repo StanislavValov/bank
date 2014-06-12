@@ -7,11 +7,11 @@ public class Account {
 
   private String transactionAmount;
 
-  public String getTransactionAmount() {
-    return transactionAmount;
+  public Account(String transactionAmount) {
+    this.transactionAmount = transactionAmount;
   }
 
-  public void setTransactionAmount(String amount) {
-    this.transactionAmount = amount;
+  public String getTransactionAmount() {
+    return transactionAmount;
   }
 }

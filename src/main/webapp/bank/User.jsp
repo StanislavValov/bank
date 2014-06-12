@@ -16,13 +16,17 @@
 </head>
 <body bgcolor="#b0c4de">
 
-<Form method="post" action="/ClientService">
+
+<Form method="post" action="UserAccountController.do">
+    <% DecimalFormat format = new DecimalFormat("#.##");%>
+    <p>Amount: <%= format.format(request.getAttribute("amount")) %> $</p>
+</Form>
+
+<Form method="post" action="/BankController.do">
     <input type="text" name="amount"><br/>
     <input type="submit" name="deposit" value="Deposit">
     <input type="submit" name="withdraw" value="Withdraw">
 </Form>
-<% DecimalFormat format = new DecimalFormat("#.##");%>
-<p>Amount: <%= format.format(session.getAttribute("amount")) %> $</p>
 
 <p>
     <%
@@ -35,7 +39,7 @@
     %>
 </p>
 
-<form method="post" action="/LogoutController">
+<form method="post" action="/LogoutController.do">
     <input type="submit" name="logout" value="Logout">
 </form>
 

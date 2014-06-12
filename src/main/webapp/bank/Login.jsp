@@ -23,10 +23,11 @@
     Username: <input type="text" name="userName"><br/>
     Password: <input type="password" name="password"><br/>
     <input type="submit" value="Login">
+    <%--<input type="checkbox" id="check"><label for="check" style="font-size: small">Remember me</label>--%>
     <label style="font-style: italic; font-size: small;color: red">
         <%
-            if (session.getAttribute("error") != null) {
-                out.println(session.getAttribute("error"));
+            if (request.getAttribute("error") != null) {
+                out.println(request.getAttribute("error"));
             }
         %>
     </label>

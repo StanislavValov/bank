@@ -3,22 +3,19 @@ package com.clouway.bank.core;
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
+
 public class User {
 
   private String userName;
   private String password;
   private Account account;
+  private String sessionId;
 
-  public void setUserName(String userName) {
+  public User(String userName, String password, Account account, String sessionId) {
     this.userName = userName;
-  }
-
-  public void setPassword(String password) {
     this.password = password;
-  }
-
-  public void setAccount(Account account) {
     this.account = account;
+    this.sessionId = sessionId;
   }
 
   public String getUserName() {
@@ -31,5 +28,9 @@ public class User {
 
   public Account getAccount() {
     return account;
+  }
+
+  public String getSessionId() {
+    return sessionId;
   }
 }

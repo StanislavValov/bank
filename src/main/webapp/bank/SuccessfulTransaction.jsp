@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: clouway
-  Date: 6/3/14
-  Time: 9:39 AM
+  Date: 6/12/14
+  Time: 10:12 AM
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -11,13 +11,9 @@
     <title></title>
 </head>
 <body bgcolor="#b0c4de">
-<label style="font-style: italic; font-size: small;color: red">
-    <%= request.getAttribute("invalidAmount") %>
-</label>
-<p></p>
 
-<form action="/bank/User.jsp">
-    <input type="submit" value="Back">
+<form method="post" action="/BankController.do">
+    <label style="font-style: italic; font-size: medium;color: blue">Transaction is made</label>
 </form>
 
 </body>

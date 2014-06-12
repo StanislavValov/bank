@@ -28,14 +28,14 @@ public class LoginControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    user = new User();
-    loginController = new LoginController(accountService, user);
+//    user = new User();
+//    loginController = new LoginController(accountService, user);
   }
 
   @Test
   public void loginSuccess() throws Exception {
-    user.setUserName("Ivan");
-    user.setPassword("unknown");
+//    user.setUserName("Ivan");
+//    user.setPassword("unknown");
 
     context.checking(new Expectations() {
       {
@@ -48,12 +48,12 @@ public class LoginControllerTest {
         oneOf(request).getSession();
         will(returnValue(session));
 
-        oneOf(accountService).getPassword(user);
+//        oneOf(accountService).getPassword(user);
         will(returnValue(user.getPassword()));
 
         oneOf(session).setAttribute("userName", user.getUserName());
 
-        oneOf(accountService).getAccountAmount(user);
+//        oneOf(accountService).getAccountAmount(user);
         will(returnValue(11.11));
 
         oneOf(session).setAttribute("amount", 11.11);
@@ -66,8 +66,8 @@ public class LoginControllerTest {
   @Test
   public void loginFailed() throws Exception {
 
-    user.setUserName("Torbalan");
-    user.setPassword("unknown");
+//    user.setUserName("Torbalan");
+//    user.setPassword("unknown");
 
     context.checking(new Expectations(){
       {
@@ -80,7 +80,7 @@ public class LoginControllerTest {
         oneOf(request).getParameter("password");
         will(returnValue(user.getPassword()));
 
-        oneOf(accountService).getPassword(user);
+//        oneOf(accountService).getPassword(user);
         will(returnValue("somethingElse"));
 
         oneOf(session).setAttribute("error","Wrong Password or Username");

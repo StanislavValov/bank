@@ -10,56 +10,6 @@
   <display-name>Archetype Created Web Application</display-name>
 
 
-  <servlet>
-    <servlet-name>LoginController</servlet-name>
-    <servlet-class>com.clouway.bank.http.LoginController</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>bankController</servlet-name>
-    <servlet-class>com.clouway.bank.http.BankController</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>registration</servlet-name>
-    <servlet-class>com.clouway.bank.http.RegistrationController</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>controller</servlet-name>
-    <servlet-class>com.clouway.bank.http.LogoutController</servlet-class>
-  </servlet>
-
-  <servlet>
-    <servlet-name>userAccountController</servlet-name>
-    <servlet-class>com.clouway.bank.http.UserAccountController</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>LoginController</servlet-name>
-    <url-pattern>/LoginController</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>bankController</servlet-name>
-    <url-pattern>/BankController</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>registration</servlet-name>
-    <url-pattern>/Registration</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>controller</servlet-name>
-    <url-pattern>/LogoutController</url-pattern>
-  </servlet-mapping>
-
-  <servlet-mapping>
-    <servlet-name>userAccountController</servlet-name>
-    <url-pattern>/UserAccountController</url-pattern>
-  </servlet-mapping>
-
   <filter>
     <filter-name>guiceFilter</filter-name>
     <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>

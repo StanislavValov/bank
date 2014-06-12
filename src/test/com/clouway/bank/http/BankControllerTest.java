@@ -25,6 +25,7 @@ public class BankControllerTest {
   Account account;
   User user;
 
+
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
   HttpSession session = context.mock(HttpSession.class);
@@ -34,17 +35,17 @@ public class BankControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    user = new User();
-    account = new Account();
-    bankController = new BankController(bankService, accountService, validator, user);
+//    user = new User("Ivan");
+//    account = new Account();
+//    bankController = new BankController(bankService, accountService, validator, user);
   }
 
   @Test
   public void amountIsNotCorrect() throws Exception {
 
-    account.setTransactionAmount("1.11");
-    user.setUserName("Ivan");
-    user.setAccount(account);
+//    account.setTransactionAmount("1.11");
+//    user.setUserName("Ivan");
+//    user.setAccount(account);
 
     context.checking(new Expectations() {
       {
@@ -71,7 +72,7 @@ public class BankControllerTest {
 
   @Test
   public void depositSuccess() throws Exception {
-    user.setUserName("Ivan");
+//    user.setUserName("Ivan");
     context.checking(new Expectations() {
       {
         oneOf(request).getSession();
@@ -94,7 +95,7 @@ public class BankControllerTest {
         oneOf(response).sendRedirect("/bank/User.jsp");
         oneOf(request).getParameter("withdraw");
 
-        oneOf(accountService).getAccountAmount(user);
+//        oneOf(accountService).getAccountAmount(user);
         will(returnValue(1.12));
 
         oneOf(session).setAttribute("amount", 1.12);
