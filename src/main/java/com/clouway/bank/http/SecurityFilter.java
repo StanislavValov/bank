@@ -1,6 +1,9 @@
 package com.clouway.bank.http;
 
+import com.clouway.bank.core.AccountService;
 import com.clouway.bank.core.CurrentUser;
+import com.clouway.bank.core.SiteMap;
+import com.clouway.bank.core.TimeUtility;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -13,6 +16,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -21,10 +25,14 @@ import java.io.IOException;
 public class SecurityFilter implements Filter {
 
   private Provider<CurrentUser> currentUserProvider;
+  private AccountService accountService;
+  private SiteMap siteMap;
 
   @Inject
-  public SecurityFilter(Provider<CurrentUser> currentUserProvider) {
+  public SecurityFilter(Provider<CurrentUser> currentUserProvider, AccountService accountService, SiteMap siteMap) {
     this.currentUserProvider = currentUserProvider;
+    this.accountService = accountService;
+    this.siteMap = siteMap;
   }
 
   @Override
@@ -37,10 +45,13 @@ public class SecurityFilter implements Filter {
 
     HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-    if (currentUserProvider.get()==null) {
-      httpResponse.sendRedirect("/bank/Login.jsp");
+    Timestamp expirationTime = accountService.getExpirationTime(currentUserProvider.get().getUser());
+
+    if (currentUserProvider.get()==null || expirationTime.before(TimeUtility.currentTime())) {
+      httpResponse.sendRedirect(siteMap.loginJspLabel());
     }
     else {
+      accountService.resetSessionLife(currentUserProvider.get().getUser().getSessionId());
       filterChain.doFilter(servletRequest, servletResponse);
     }
   }

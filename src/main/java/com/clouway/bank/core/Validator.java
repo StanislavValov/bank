@@ -11,12 +11,8 @@ public class Validator implements BankValidator {
   }
 
   @Override
-  public boolean userNameIsValid(String userName) {
-    return userName.matches("^[A-Za-z]{5,15}?$");
-  }
-
-  @Override
-  public boolean passwordIsValid(String password) {
-    return password.matches("^[0-9a-zA-Z]{6,18}?$");
+  public boolean userDataAreValid(User user){
+    return user.getUserName().matches("^[A-Za-z]{5,15}?$") &&
+            user.getPassword().matches("^[0-9a-zA-Z]{6,18}?$");
   }
 }

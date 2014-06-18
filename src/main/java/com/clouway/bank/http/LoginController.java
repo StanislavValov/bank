@@ -1,14 +1,12 @@
 package com.clouway.bank.http;
 
 import com.clouway.bank.core.AccountService;
-import com.clouway.bank.core.Security;
-import com.clouway.bank.core.TimeUtility;
+import com.clouway.bank.core.SiteMap;
 import com.clouway.bank.core.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,36 +19,42 @@ import java.io.IOException;
 public class LoginController extends HttpServlet {
 
   private AccountService accountService;
-  private Security security;
+  private Session session;
+  private SiteMap siteMap;
 
   @Inject
-  public LoginController(AccountService accountService, Security security, TimeUtility timeUtility) {
+  public LoginController(AccountService accountService, Session session, SiteMap siteMap) {
     this.accountService = accountService;
-    this.security = security;
+    this.session = session;
+    this.siteMap = siteMap;
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    String sessionId = session.getId();
+    String password = req.getParameter(siteMap.password());
+    String userName = req.getParameter(siteMap.userName());
 
-    String sessionId = req.getParameter("userName");
-    User user = new User(req.getParameter("userName"),
-            req.getParameter("password"), null, sessionId);
+    User user = new User(userName, password, null, sessionId);
 
-    if (user.getPassword().equals(accountService.getPassword(user))) {
+    if (password.equals(accountService.getPassword(user))) {
 
-      req.setAttribute("userName",user.getUserName());
+      req.setAttribute(siteMap.userName(), userName);
 
-      Cookie sessionCookie = new Cookie(req.getParameter("userName"),sessionId);
-      resp.addCookie(sessionCookie);
-      if (accountService.findUserAssociatedWithSession(sessionCookie.getValue())==null) {
-        accountService.addUserAssociatedWithSession(user);
-      }
+      resp.addCookie(session.getCookie(userName, sessionId));
 
-      req.getRequestDispatcher("/UserAccountController.do").forward(req, resp);
+      accountService.addUserAssociatedWithSession(user);
+
+      req.getRequestDispatcher(siteMap.userAccountController()).forward(req, resp);
+
     } else {
-      req.setAttribute("error", "Wrong Password or Username");
-      req.getRequestDispatcher("/bank/Login.jsp").forward(req,resp);
+      req.setAttribute(siteMap.errorLabel(), siteMap.identificationFailed());
+      req.getRequestDispatcher(siteMap.loginJspLabel()).include(req, resp);
     }
+  }
 
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    req.getRequestDispatcher(siteMap.userAccountController()).forward(req, resp);
   }
 }

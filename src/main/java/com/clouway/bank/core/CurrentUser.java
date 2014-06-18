@@ -11,8 +11,7 @@ public class CurrentUser {
     this.user = user;
   }
 
-  public String getUserName() {
-    return user.getUserName();
+  public User getUser() {
+    return user;
   }
-
 }

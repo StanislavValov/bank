@@ -1,6 +1,8 @@
 package com.clouway.bank.http;
 
 import com.clouway.bank.core.AccountService;
+import com.clouway.bank.core.LabelMap;
+import com.clouway.bank.core.SiteMap;
 import com.clouway.bank.core.User;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -8,9 +10,13 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -20,44 +26,61 @@ public class LoginControllerTest {
   LoginController loginController;
   Mockery context = new JUnit4Mockery();
   User user;
+  SiteMap siteMap;
+  Cookie cookie;
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
   AccountService accountService = context.mock(AccountService.class);
-  HttpSession session = context.mock(HttpSession.class);
+  Session session = context.mock(Session.class);
+
 
   @Before
   public void setUp() throws Exception {
-//    user = new User();
-//    loginController = new LoginController(accountService, user);
+    user = new User("Torbalan", "unknown", null, "123");
+    siteMap = new LabelMap();
+    cookie = new Cookie(user.getUserName(),user.getSessionId());
+    loginController = new LoginController(accountService, session, siteMap);
+  }
+
+
+  @Test
+  public void equality() throws Exception {
+    assertThat(user,is((new User("Torbalan","unknown",null, "123"))));
+  }
+
+  @Test
+  public void objectsAreNotEqual() throws Exception {
+    assertThat(user,is(not(new User("Tor", "known", null, "111"))));
   }
 
   @Test
   public void loginSuccess() throws Exception {
-//    user.setUserName("Ivan");
-//    user.setPassword("unknown");
 
     context.checking(new Expectations() {
       {
-        oneOf(request).getParameter("userName");
+        oneOf(session).getId();
+        will(returnValue(user.getSessionId()));
+
+        oneOf(request).getParameter(siteMap.password());
+        will(returnValue(user.getPassword()));
+
+        oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(request).getParameter("password");
+        oneOf(accountService).getPassword(user);
         will(returnValue(user.getPassword()));
 
-        oneOf(request).getSession();
-        will(returnValue(session));
+        oneOf(request).setAttribute(siteMap.userName(),user.getUserName());
 
-//        oneOf(accountService).getPassword(user);
-        will(returnValue(user.getPassword()));
+        oneOf(session).getCookie(user.getUserName(),user.getSessionId());
+        will(returnValue(cookie));
 
-        oneOf(session).setAttribute("userName", user.getUserName());
+        oneOf(response).addCookie(cookie);
 
-//        oneOf(accountService).getAccountAmount(user);
-        will(returnValue(11.11));
+        oneOf(accountService).addUserAssociatedWithSession(user);
 
-        oneOf(session).setAttribute("amount", 11.11);
-        oneOf(request).getRequestDispatcher("/UserAccountController");
+        oneOf(request).getRequestDispatcher(siteMap.userAccountController());
       }
     });
     loginController.doPost(request, response);
@@ -66,28 +89,36 @@ public class LoginControllerTest {
   @Test
   public void loginFailed() throws Exception {
 
-//    user.setUserName("Torbalan");
-//    user.setPassword("unknown");
+    context.checking(new Expectations() {
+      {
+        oneOf(session).getId();
+        will(returnValue(user.getSessionId()));
+
+        oneOf(request).getParameter(siteMap.password());
+        will(returnValue(user.getPassword()));
+
+        oneOf(request).getParameter(siteMap.userName());
+        will(returnValue(user.getUserName()));
+
+        oneOf(accountService).getPassword(user);
+        will(returnValue("1122"));
+
+        oneOf(request).setAttribute(siteMap.errorLabel(),siteMap.identificationFailed());
+
+        oneOf(request).getRequestDispatcher(siteMap.loginJspLabel());
+      }
+    });
+    loginController.doPost(request, response);
+  }
+
+  @Test
+  public void successfulRedirectToUAC() throws Exception {
 
     context.checking(new Expectations(){
       {
-        oneOf(request).getSession();
-        will(returnValue(session));
-
-        oneOf(request).getParameter("userName");
-        will(returnValue(user.getUserName()));
-
-        oneOf(request).getParameter("password");
-        will(returnValue(user.getPassword()));
-
-//        oneOf(accountService).getPassword(user);
-        will(returnValue("somethingElse"));
-
-        oneOf(session).setAttribute("error","Wrong Password or Username");
-
-        oneOf(response).sendRedirect("/bank/Login.jsp");
+        oneOf(request).getRequestDispatcher(siteMap.userAccountController());
       }
     });
-    loginController.doPost(request,response);
+    loginController.doGet(request,response);
   }
 }

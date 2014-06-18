@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSessionListener;
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
+
 public class Counter implements HttpSessionListener {
 
   private int activeSessions = 0;

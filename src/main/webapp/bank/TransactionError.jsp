@@ -12,11 +12,11 @@
 </head>
 <body bgcolor="#b0c4de">
 <label style="font-style: italic; font-size: small;color: red">
-    <%= request.getAttribute("invalidAmount") %>
+    <%= request.getAttribute("amountError") %>
 </label>
 <p></p>
 
-<form action="/bank/User.jsp">
+<form action="/UserAccountController.do">
     <input type="submit" value="Back">
 </form>
 

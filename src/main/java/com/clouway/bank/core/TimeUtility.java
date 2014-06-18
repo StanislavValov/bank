@@ -1,18 +1,20 @@
 package com.clouway.bank.core;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.sql.Timestamp;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 public class TimeUtility {
 
-  public static Date time(int year,int month, int day) {
+  public static Timestamp expirationDate() {
+    long expTime = System.currentTimeMillis()+1*60*1000;
+    Timestamp time = new Timestamp(System.currentTimeMillis());
+    time.setTime(expTime);
+    return time;
+  }
 
-    Calendar calendar = Calendar.getInstance();
-    calendar.set(year,month,day);
-
-    return calendar.getTime();
+  public static Timestamp currentTime(){
+    return new Timestamp(System.currentTimeMillis());
   }
 }

@@ -1,10 +1,7 @@
 package com.clouway.bank.http;
 
-import com.clouway.bank.core.Account;
-import com.clouway.bank.core.AccountService;
-import com.clouway.bank.core.BankService;
-import com.clouway.bank.core.BankValidator;
-import com.clouway.bank.core.User;
+import com.clouway.bank.core.*;
+import com.google.inject.Provider;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
@@ -13,58 +10,51 @@ import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 public class BankControllerTest {
 
-  BankController bankController = null;
   Mockery context = new JUnit4Mockery();
-  Account account;
+  BankController bankController = null;
   User user;
-
+  SiteMap siteMap;
+  Account account;
+  CurrentUser currentUser;
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
-  HttpSession session = context.mock(HttpSession.class);
   BankService bankService = context.mock(BankService.class);
-  AccountService accountService = context.mock(AccountService.class);
-  BankValidator validator = context.mock(BankValidator.class);
+  BankValidator bankValidator = context.mock(BankValidator.class);
+  Provider provider = context.mock(Provider.class);
 
   @Before
   public void setUp() throws Exception {
-//    user = new User("Ivan");
-//    account = new Account();
-//    bankController = new BankController(bankService, accountService, validator, user);
+    siteMap = new LabelMap();
+    account = new Account("10.101");
+    user = new User("Ivan", account);
+    currentUser = new CurrentUser(user);
+    bankController = new BankController(bankService, bankValidator,provider,siteMap);
   }
 
   @Test
   public void amountIsNotCorrect() throws Exception {
 
-//    account.setTransactionAmount("1.11");
-//    user.setUserName("Ivan");
-//    user.setAccount(account);
-
     context.checking(new Expectations() {
       {
-        oneOf(request).getSession();
-        will(returnValue(session));
+        oneOf(request).getParameter(siteMap.amountLabel());
+        will(returnValue(account.getTransactionAmount()));
 
-        oneOf(request).getParameter("amount");
-        will(returnValue("1.12"));
+        oneOf(provider).get();
+        will(returnValue(currentUser));
 
-        oneOf(validator).transactionIsValid(user);
+        oneOf(bankValidator).transactionIsValid(user);
         will(returnValue(false));
 
-        oneOf(session).setAttribute("invalidAmount", "Please enter valid amount");
-        oneOf(request).getParameter("withdraw");
+        oneOf(request).setAttribute(siteMap.amountErrorLabel(),siteMap.amountErrorMessage());
 
-        oneOf(session).getAttribute("userName");
-        will(returnValue(user.getUserName()));
-
-        oneOf(response).sendRedirect("/bank/TransactionError.jsp");
+        oneOf(request).getRequestDispatcher(siteMap.transactionErrorLabel());
       }
     });
     bankController.doPost(request, response);
@@ -72,37 +62,55 @@ public class BankControllerTest {
 
   @Test
   public void depositSuccess() throws Exception {
-//    user.setUserName("Ivan");
+
     context.checking(new Expectations() {
       {
-        oneOf(request).getSession();
-        will(returnValue(session));
+        oneOf(request).getParameter(siteMap.amountLabel());
+        will(returnValue(account.getTransactionAmount()));
 
-        oneOf(request).getParameter("amount");
-        will(returnValue("1.12"));
+        oneOf(provider).get();
+        will(returnValue(currentUser));
 
-        oneOf(validator).transactionIsValid(user);
+        oneOf(bankValidator).transactionIsValid(user);
         will(returnValue(true));
 
-        oneOf(request).getParameter("deposit");
-        will(returnValue("Deposit"));
+        oneOf(request).getParameter(siteMap.depositLabel());
+        will(returnValue(siteMap.depositLabel()));
 
         oneOf(bankService).deposit(user);
 
-        oneOf(request).getParameter("amount");
-        will(returnValue("1.12"));
+        oneOf(request).getParameter(siteMap.withdrawLabel());
 
-        oneOf(response).sendRedirect("/bank/User.jsp");
-        oneOf(request).getParameter("withdraw");
-
-//        oneOf(accountService).getAccountAmount(user);
-        will(returnValue(1.12));
-
-        oneOf(session).setAttribute("amount", 1.12);
-        oneOf(session).getAttribute("userName");
-        will(returnValue(user.getUserName()));
+        oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
       }
     });
     bankController.doPost(request, response);
+  }
+
+  @Test
+  public void withdrawSuccess() throws Exception {
+
+    context.checking(new Expectations(){
+      {
+        oneOf(request).getParameter(siteMap.amountLabel());
+        will(returnValue(account.getTransactionAmount()));
+
+        oneOf(provider).get();
+        will(returnValue(currentUser));
+
+        oneOf(bankValidator).transactionIsValid(user);
+        will(returnValue(true));
+
+        oneOf(request).getParameter(siteMap.depositLabel());
+
+        oneOf(request).getParameter(siteMap.withdrawLabel());
+        will(returnValue(siteMap.withdrawLabel()));
+
+        oneOf(bankService).withdraw(user);
+
+        oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
+      }
+    });
+    bankController.doPost(request,response);
   }
 }

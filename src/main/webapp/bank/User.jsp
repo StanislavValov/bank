@@ -17,15 +17,20 @@
 <body bgcolor="#b0c4de">
 
 
-<Form method="post" action="UserAccountController.do">
+<Form method="get" action="/UserAccountController.do">
     <% DecimalFormat format = new DecimalFormat("#.##");%>
-    <p>Amount: <%= format.format(request.getAttribute("amount")) %> $</p>
+    <p>Amount:
+    <%
+        if (request.getAttribute("amount")!=null) {
+           out.print(format.format(request.getAttribute("amount")));
+       }
+    %> $</p>
 </Form>
 
 <Form method="post" action="/BankController.do">
     <input type="text" name="amount"><br/>
-    <input type="submit" name="deposit" value="Deposit">
-    <input type="submit" name="withdraw" value="Withdraw">
+    <input type="submit" name="deposit" value="deposit">
+    <input type="submit" name="withdraw" value="withdraw">
 </Form>
 
 <p>
@@ -33,7 +38,7 @@
         if (request.getAttribute("error") != null) {
             out.print(request.getAttribute("error"));
         }
-        if (session.getAttribute("transactionError") != null) {
+        if (request.getAttribute("transactionError") != null) {
             out.print(session.getAttribute("transactionError"));
         }
     %>

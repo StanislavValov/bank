@@ -18,6 +18,15 @@ public class User {
     this.sessionId = sessionId;
   }
 
+  public User(String userName) {
+    this.userName = userName;
+  }
+
+  public User(String userName, Account account) {
+    this.userName = userName;
+    this.account = account;
+  }
+
   public String getUserName() {
     return userName;
   }
@@ -32,5 +41,23 @@ public class User {
 
   public String getSessionId() {
     return sessionId;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    User user = (User) o;
+
+    if (password != null && user.password != null) {
+      if (!password.equals(user.password)) return false;
+    }
+    if (sessionId != null && user.sessionId != null) {
+      if (!sessionId.equals(user.sessionId)) return false;
+    }
+    if (!userName.equals(user.userName)) return false;
+
+    return true;
   }
 }

@@ -23,14 +23,15 @@ public class HttpModule extends ServletModule {
 
     serve("/BankController.do").with(BankController.class);
     serve("/LoginController").with(LoginController.class);
-    serve("/Registration.do").with(RegistrationController.class);
+    serve("/Registration").with(RegistrationController.class);
     serve("/UserAccountController.do").with(UserAccountController.class);
     serve("/LogoutController.do").with(LogoutController.class);
 
     bind(BankService.class).to(PersistentBankService.class);
     bind(AccountService.class).to(PersistentBankService.class);
-    bind(Security.class).to(SessionIdGenerator.class);
+    bind(Session.class).to(SessionRepository.class);
     bind(BankValidator.class).to(Validator.class);
+    bind(SiteMap.class).to(LabelMap.class);
   }
 
   @Provides
@@ -45,11 +46,13 @@ public class HttpModule extends ServletModule {
 
     if (cookies!=null) {
       for (Cookie cookie : cookies) {
+        for (int i = 0; i < accountService.getSessionId(cookie.getName()).size(); i++) {
 
-        if (cookie.getValue().equalsIgnoreCase(accountService.getSessionId(cookie.getName()))) {
+          if (cookie.getValue().equalsIgnoreCase((String) accountService.getSessionId(cookie.getName()).get(i))) {
 
-          User user = accountService.findUserAssociatedWithSession(cookie.getValue());
-          return new CurrentUser(user);
+            User user = accountService.findUserAssociatedWithSession(cookie.getName());
+            return new CurrentUser(user);
+          }
         }
       }
     }
