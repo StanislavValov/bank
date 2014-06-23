@@ -2,12 +2,14 @@ package com.clouway.bank.persistence;
 
 import com.clouway.bank.core.AccountService;
 import com.clouway.bank.core.BankService;
-import com.clouway.bank.core.TimeUtility;
+import com.clouway.bank.core.ClockUtil;
+import com.clouway.bank.http.SessionService;
 import com.clouway.bank.core.User;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
+import javax.servlet.http.Cookie;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -19,13 +21,15 @@ import java.util.List;
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @Singleton
-public class PersistentBankService implements BankService, AccountService {
+public class PersistentBankService implements BankService, AccountService, SessionService {
 
   private final Provider<Connection> connectionProvider;
+  private ClockUtil clockUtil;
 
   @Inject
-  public PersistentBankService(Provider<Connection> connectionProvider) {
+  public PersistentBankService(Provider<Connection> connectionProvider, ClockUtil clockUtil) {
     this.connectionProvider = connectionProvider;
+    this.clockUtil = clockUtil;
   }
 
   @Override
@@ -42,27 +46,6 @@ public class PersistentBankService implements BankService, AccountService {
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    if (preparedStatement!=null){
-      try {
-        preparedStatement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
-  @Override
-  public void addUserAssociatedWithSession(User user) {
-    PreparedStatement preparedStatement = null;
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement("insert into sessions values (?,?,?)");
-      preparedStatement.setString(1, user.getSessionId());
-      preparedStatement.setTimestamp(2, TimeUtility.expirationDate());
-      preparedStatement.setString(3, user.getUserName());
-      preparedStatement.execute();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
     if (preparedStatement != null) {
       try {
         preparedStatement.close();
@@ -73,36 +56,7 @@ public class PersistentBankService implements BankService, AccountService {
   }
 
   @Override
-  public String getPassword(User user) {
-    PreparedStatement preparedStatement = null;
-    String password = null;
-    String sql = "select password " +
-            "from accounts " +
-            "where userName=?";
-
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1, user.getUserName());
-      preparedStatement.execute();
-      while (preparedStatement.getResultSet().next()) {
-        password = preparedStatement.getResultSet().getString("password");
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    try {
-      if (preparedStatement != null) {
-        preparedStatement.close();
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-    return password;
-  }
-
-  @Override
-  public List<String> getSessionId(String userName) {
+  public List<String> getSessionIds(String userName) {
     PreparedStatement preparedStatement = null;
     String sql = "select sessionId from sessions where userName=?";
     List<String> id = new ArrayList<String>();
@@ -129,16 +83,16 @@ public class PersistentBankService implements BankService, AccountService {
   @Override
   public void removeSessionId(User user) {
     PreparedStatement preparedStatement = null;
-    String sql ="delete from sessions where sessionId=?";
+    String sql = "delete from sessions where sessionId=?";
 
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1,user.getSessionId());
+      preparedStatement.setString(1, user.getSessionId());
       preparedStatement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    if (preparedStatement!=null){
+    if (preparedStatement != null) {
       try {
         preparedStatement.close();
       } catch (SQLException e) {
@@ -154,11 +108,11 @@ public class PersistentBankService implements BankService, AccountService {
     User searchedUser = null;
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1,userName);
+      preparedStatement.setString(1, userName);
       preparedStatement.execute();
       while (preparedStatement.getResultSet().next()) {
         searchedUser = new User(preparedStatement.getResultSet().getString("userName"), null, null,
-                 preparedStatement.getResultSet().getString("sessionId"));
+                preparedStatement.getResultSet().getString("sessionId"));
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -203,7 +157,9 @@ public class PersistentBankService implements BankService, AccountService {
     PreparedStatement preparedStatement = null;
     try {
       preparedStatement = connectionProvider.get().prepareStatement
-              ("update accounts set amount=amount+" + user.getAccount().getTransactionAmount() + " where userName='" + user.getUserName() + "'");
+              ("update accounts set amount=amount+? where userName=?");
+      preparedStatement.setString(1, user.getAccount().getTransactionAmount());
+      preparedStatement.setString(2, user.getUserName());
       preparedStatement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -222,8 +178,9 @@ public class PersistentBankService implements BankService, AccountService {
     PreparedStatement preparedStatement = null;
     try {
       preparedStatement = connectionProvider.get().prepareStatement
-              ("update accounts set amount=amount-" + user.getAccount().getTransactionAmount() + " where userName='" + user.getUserName() + "' " +
-                      "and " + user.getAccount().getTransactionAmount() + " <= amount");
+              ("update accounts set amount=amount-? where userName=? and " + user.getAccount().getTransactionAmount() + " <= amount");
+      preparedStatement.setString(1, user.getAccount().getTransactionAmount());
+      preparedStatement.setString(2, user.getUserName());
       preparedStatement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -250,7 +207,7 @@ public class PersistentBankService implements BankService, AccountService {
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    if (preparedStatement!=null){
+    if (preparedStatement != null) {
       try {
         preparedStatement.close();
       } catch (SQLException e) {
@@ -261,15 +218,112 @@ public class PersistentBankService implements BankService, AccountService {
   }
 
   @Override
-  public Timestamp getExpirationTime(User user){
+  public Timestamp getSessionExpirationTime(User user) {
     PreparedStatement preparedStatement = null;
     String sql = "SELECT expirationDate from sessions where userName=?";
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1,user.getUserName());
+      preparedStatement.setString(1, user.getUserName());
       preparedStatement.execute();
-      while (preparedStatement.getResultSet().next()){
+      while (preparedStatement.getResultSet().next()) {
         return preparedStatement.getResultSet().getTimestamp("expirationDate");
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    if (preparedStatement != null) {
+      try {
+        preparedStatement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void resetSessionLife(User user) {
+    PreparedStatement preparedStatement = null;
+    String sql = "UPDATE sessions set expirationDate=? where sessionId=?";
+
+    try {
+      preparedStatement = connectionProvider.get().prepareStatement(sql);
+      preparedStatement.setTimestamp(1, clockUtil.expirationDate());
+      preparedStatement.setString(2, user.getSessionId());
+      preparedStatement.execute();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    if (preparedStatement != null) {
+      try {
+        preparedStatement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  @Override
+  public void cleanAccountsTable() {
+    PreparedStatement preparedStatement = null;
+    String sql = "delete from accounts";
+
+    try {
+      preparedStatement = connectionProvider.get().prepareStatement(sql);
+      preparedStatement.execute();
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    if (preparedStatement != null) {
+      try {
+        preparedStatement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  @Override
+  public void cleanSessionsTable() {
+    PreparedStatement preparedStatement = null;
+    String sql = "delete from sessions";
+
+    try {
+      preparedStatement = connectionProvider.get().prepareStatement(sql);
+      preparedStatement.execute();
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    if (preparedStatement != null) {
+      try {
+        preparedStatement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  @Override
+  public Cookie authenticate(User user) {
+    PreparedStatement preparedStatement = null;
+
+    Cookie cookie = null;
+
+    String sql = "select userName,password " +
+            "from accounts " +
+            "where userName=?";
+    try {
+      preparedStatement = connectionProvider.get().prepareStatement(sql);
+      preparedStatement.setString(1, user.getUserName());
+      preparedStatement.execute();
+
+      while (preparedStatement.getResultSet().next()) {
+        if (preparedStatement.getResultSet().getString("password").equals(user.getPassword())){
+          cookie = new Cookie(preparedStatement.getResultSet().getString("userName"),user.getSessionId());
+          addUserAssociatedWithSession(user);
+        }
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -281,23 +335,21 @@ public class PersistentBankService implements BankService, AccountService {
         e.printStackTrace();
       }
     }
-    return null;
+    return cookie;
   }
 
-  @Override
-  public void resetSessionLife(String sessionId){
+  private void addUserAssociatedWithSession(User user) {
     PreparedStatement preparedStatement = null;
-    String sql = "UPDATE sessions set expirationDate=? where sessionId=?";
-
     try {
-      preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setTimestamp(1,TimeUtility.expirationDate());
-      preparedStatement.setString(2,sessionId);
+      preparedStatement = connectionProvider.get().prepareStatement("insert into sessions values (?,?,?)");
+      preparedStatement.setString(1, user.getSessionId());
+      preparedStatement.setTimestamp(2, clockUtil.expirationDate());
+      preparedStatement.setString(3, user.getUserName());
       preparedStatement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    if (preparedStatement!=null){
+    if (preparedStatement != null) {
       try {
         preparedStatement.close();
       } catch (SQLException e) {

@@ -48,7 +48,7 @@ public class RegistrationController extends HttpServlet {
 
     } else {
       req.setAttribute(siteMap.errorLabel(), siteMap.validateErrorMessage());
+      req.getRequestDispatcher(siteMap.registrationJspLabel()).forward(req, resp);
     }
-    req.getRequestDispatcher(siteMap.registrationJspLabel()).forward(req, resp);
   }
 }

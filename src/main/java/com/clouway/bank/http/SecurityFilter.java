@@ -1,9 +1,9 @@
 package com.clouway.bank.http;
 
-import com.clouway.bank.core.AccountService;
+import com.clouway.bank.core.ClockUtil;
 import com.clouway.bank.core.CurrentUser;
 import com.clouway.bank.core.SiteMap;
-import com.clouway.bank.core.TimeUtility;
+import com.clouway.bank.core.User;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -25,14 +25,16 @@ import java.sql.Timestamp;
 public class SecurityFilter implements Filter {
 
   private Provider<CurrentUser> currentUserProvider;
-  private AccountService accountService;
+  private SessionService accountService;
   private SiteMap siteMap;
+  private ClockUtil clockUtil;
 
   @Inject
-  public SecurityFilter(Provider<CurrentUser> currentUserProvider, AccountService accountService, SiteMap siteMap) {
+  public SecurityFilter(Provider<CurrentUser> currentUserProvider, SessionService sessionService, SiteMap siteMap, ClockUtil clockUtil) {
     this.currentUserProvider = currentUserProvider;
-    this.accountService = accountService;
+    this.accountService = sessionService;
     this.siteMap = siteMap;
+    this.clockUtil = clockUtil;
   }
 
   @Override
@@ -45,17 +47,24 @@ public class SecurityFilter implements Filter {
 
     HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-    Timestamp expirationTime = accountService.getExpirationTime(currentUserProvider.get().getUser());
+    User user = currentUserProvider.get().getUser();
 
-    if (currentUserProvider.get()==null || expirationTime.before(TimeUtility.currentTime())) {
-      httpResponse.sendRedirect(siteMap.loginJspLabel());
+    if (user != null) {
+      Timestamp expirationTime = accountService.getSessionExpirationTime(user);
+
+      if (expirationTime.before(clockUtil.currentTime())) {
+        accountService.removeSessionId(user);
+        httpResponse.sendRedirect(siteMap.loginJspLabel());
+
+      } else {
+        accountService.resetSessionLife(user);
+        filterChain.doFilter(servletRequest, servletResponse);
+      }
     }
     else {
-      accountService.resetSessionLife(currentUserProvider.get().getUser().getSessionId());
-      filterChain.doFilter(servletRequest, servletResponse);
+      httpResponse.sendRedirect(siteMap.loginJspLabel());
     }
   }
-
   @Override
   public void destroy() {
 

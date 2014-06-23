@@ -1,6 +1,5 @@
 package com.clouway.bank.http;
 
-import com.clouway.bank.core.AccountService;
 import com.clouway.bank.core.CurrentUser;
 import com.clouway.bank.core.SiteMap;
 import com.clouway.bank.core.User;
@@ -32,13 +31,13 @@ public class LogoutControllerTest {
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
-  AccountService accountService = context.mock(AccountService.class);
+  SessionService sessionService = context.mock(SessionService.class);
   Provider currentUserProvider = context.mock(Provider.class);
   SiteMap siteMap = context.mock(SiteMap.class);
 
   @Before
   public void setUp() throws Exception {
-    logoutController = new LogoutController(currentUserProvider,accountService,siteMap);
+    logoutController = new LogoutController(currentUserProvider,sessionService,siteMap);
     user = new User("Torbalan", "unknown", null, "123");
     cookie = new Cookie("Torbalan","123");
     cookies = new Cookie[]{cookie};
@@ -56,7 +55,7 @@ public class LogoutControllerTest {
         oneOf(currentUserProvider).get();
         will(returnValue(currentUser));
 
-        oneOf(accountService).removeSessionId(user);
+        oneOf(sessionService).removeSessionId(user);
 
         oneOf(response).addCookie(cookie);
 

@@ -1,6 +1,5 @@
 package com.clouway.bank.http;
 
-import com.clouway.bank.core.AccountService;
 import com.clouway.bank.core.LabelMap;
 import com.clouway.bank.core.SiteMap;
 import com.clouway.bank.core.User;
@@ -31,7 +30,7 @@ public class LoginControllerTest {
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
-  AccountService accountService = context.mock(AccountService.class);
+  SessionService sessionService = context.mock(SessionService.class);
   Session session = context.mock(Session.class);
 
 
@@ -40,17 +39,17 @@ public class LoginControllerTest {
     user = new User("Torbalan", "unknown", null, "123");
     siteMap = new LabelMap();
     cookie = new Cookie(user.getUserName(),user.getSessionId());
-    loginController = new LoginController(accountService, session, siteMap);
+    loginController = new LoginController(sessionService, session, siteMap);
   }
 
 
   @Test
-  public void equality() throws Exception {
+  public void objectsAreEqual() {
     assertThat(user,is((new User("Torbalan","unknown",null, "123"))));
   }
 
   @Test
-  public void objectsAreNotEqual() throws Exception {
+  public void objectsAreNotEqual() {
     assertThat(user,is(not(new User("Tor", "known", null, "111"))));
   }
 
@@ -59,7 +58,7 @@ public class LoginControllerTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(session).getId();
+        oneOf(session).getId(user.getUserName(),user.getPassword());
         will(returnValue(user.getSessionId()));
 
         oneOf(request).getParameter(siteMap.password());
@@ -68,17 +67,12 @@ public class LoginControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(accountService).getPassword(user);
-        will(returnValue(user.getPassword()));
+        oneOf(sessionService).authenticate(user);
+        will(returnValue(cookie));
 
         oneOf(request).setAttribute(siteMap.userName(),user.getUserName());
 
-        oneOf(session).getCookie(user.getUserName(),user.getSessionId());
-        will(returnValue(cookie));
-
         oneOf(response).addCookie(cookie);
-
-        oneOf(accountService).addUserAssociatedWithSession(user);
 
         oneOf(request).getRequestDispatcher(siteMap.userAccountController());
       }
@@ -91,7 +85,7 @@ public class LoginControllerTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(session).getId();
+        oneOf(session).getId(user.getUserName(),user.getPassword());
         will(returnValue(user.getSessionId()));
 
         oneOf(request).getParameter(siteMap.password());
@@ -100,10 +94,9 @@ public class LoginControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(accountService).getPassword(user);
-        will(returnValue("1122"));
+        oneOf(sessionService).authenticate(user);
 
-        oneOf(request).setAttribute(siteMap.errorLabel(),siteMap.identificationFailed());
+        oneOf(request).setAttribute(siteMap.errorLabel(), siteMap.identificationFailed());
 
         oneOf(request).getRequestDispatcher(siteMap.loginJspLabel());
       }
@@ -112,7 +105,7 @@ public class LoginControllerTest {
   }
 
   @Test
-  public void successfulRedirectToUAC() throws Exception {
+  public void successfulRedirect() throws Exception {
 
     context.checking(new Expectations(){
       {

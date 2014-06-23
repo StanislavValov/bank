@@ -33,11 +33,6 @@ public class ConnectionPerRequestFilter implements Filter {
     dataSource.setServerName("localhost");
   }
 
-  private Connection getConnection() throws SQLException {
-    PooledConnection pooledConnection = dataSource.getPooledConnection();
-    return pooledConnection.getConnection();
-  }
-
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -63,5 +58,10 @@ public class ConnectionPerRequestFilter implements Filter {
   @Override
   public void destroy() {
 
+  }
+
+  private Connection getConnection() throws SQLException {
+    PooledConnection pooledConnection = dataSource.getPooledConnection();
+    return pooledConnection.getConnection();
   }
 }

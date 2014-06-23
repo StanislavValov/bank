@@ -1,6 +1,5 @@
 package com.clouway.bank.http;
 
-import com.clouway.bank.core.AccountService;
 import com.clouway.bank.core.CurrentUser;
 import com.clouway.bank.core.SiteMap;
 import com.clouway.bank.core.User;
@@ -22,13 +21,13 @@ import java.io.IOException;
 public class LogoutController extends HttpServlet {
 
   private Provider<CurrentUser> currentUserProvider;
-  private AccountService accountService;
+  private SessionService sessionService;
   private SiteMap siteMap;
 
   @Inject
-  public LogoutController(Provider<CurrentUser> currentUserProvider, AccountService accountService, SiteMap siteMap) {
+  public LogoutController(Provider<CurrentUser> currentUserProvider, SessionService sessionService, SiteMap siteMap) {
     this.currentUserProvider = currentUserProvider;
-    this.accountService = accountService;
+    this.sessionService = sessionService;
     this.siteMap = siteMap;
   }
 
@@ -42,7 +41,7 @@ public class LogoutController extends HttpServlet {
       User currentUser = currentUserProvider.get().getUser();
       if (currentUser.getSessionId().equalsIgnoreCase(cookie.getValue())) {
         cookie.setMaxAge(0);
-        accountService.removeSessionId(currentUser);
+        sessionService.removeSessionId(currentUser);
         resp.addCookie(cookie);
       }
     }

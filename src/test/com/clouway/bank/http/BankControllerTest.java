@@ -80,6 +80,7 @@ public class BankControllerTest {
         oneOf(bankService).deposit(user);
 
         oneOf(request).getParameter(siteMap.withdrawLabel());
+        will(returnValue(null));
 
         oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
       }
@@ -102,6 +103,7 @@ public class BankControllerTest {
         will(returnValue(true));
 
         oneOf(request).getParameter(siteMap.depositLabel());
+        will(returnValue(null));
 
         oneOf(request).getParameter(siteMap.withdrawLabel());
         will(returnValue(siteMap.withdrawLabel()));

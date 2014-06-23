@@ -45,17 +45,24 @@ public class BankController extends HttpServlet {
 
     if (validator.transactionIsValid(user)) {
 
-      if (siteMap.depositLabel().equals(req.getParameter(siteMap.depositLabel()))) {
+      if (req.getParameter(siteMap.depositLabel()) != null) {
         bankService.deposit(user);
       }
-      if (siteMap.withdrawLabel().equals(req.getParameter(siteMap.withdrawLabel()))) {
+
+      if (req.getParameter(siteMap.withdrawLabel()) != null) {
         bankService.withdraw(user);
       }
+
       resp.sendRedirect(siteMap.successfulTransactionLabel());
 
     } else {
       req.setAttribute(siteMap.amountErrorLabel(), siteMap.amountErrorMessage());
       req.getRequestDispatcher(siteMap.transactionErrorLabel()).forward(req, resp);
     }
+  }
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    resp.sendRedirect(siteMap.userAccountController());
   }
 }

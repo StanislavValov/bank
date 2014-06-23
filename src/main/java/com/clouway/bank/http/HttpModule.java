@@ -29,9 +29,11 @@ public class HttpModule extends ServletModule {
 
     bind(BankService.class).to(PersistentBankService.class);
     bind(AccountService.class).to(PersistentBankService.class);
-    bind(Session.class).to(SessionRepository.class);
+    bind(SessionService.class).to(PersistentBankService.class);
+    bind(Session.class).to(SessionIdGenerator.class);
     bind(BankValidator.class).to(Validator.class);
     bind(SiteMap.class).to(LabelMap.class);
+    bind(ClockUtil.class).to(Clock.class);
   }
 
   @Provides
@@ -41,22 +43,21 @@ public class HttpModule extends ServletModule {
 
   @Provides
   @RequestScoped
-  public CurrentUser getCurrentUser(Provider<HttpServletRequest> requestProvider, AccountService accountService) {
+  public CurrentUser getCurrentUser(Provider<HttpServletRequest> requestProvider, SessionService sessionService) {
     Cookie[] cookies = requestProvider.get().getCookies();
 
     if (cookies!=null) {
       for (Cookie cookie : cookies) {
-        for (int i = 0; i < accountService.getSessionId(cookie.getName()).size(); i++) {
+        for (int i = 0; i < sessionService.getSessionIds(cookie.getName()).size(); i++) {
 
-          if (cookie.getValue().equalsIgnoreCase((String) accountService.getSessionId(cookie.getName()).get(i))) {
+          if (cookie.getValue().equalsIgnoreCase((String) sessionService.getSessionIds(cookie.getName()).get(i))) {
 
-            User user = accountService.findUserAssociatedWithSession(cookie.getName());
+            User user = sessionService.findUserAssociatedWithSession(cookie.getName());
             return new CurrentUser(user);
           }
         }
       }
     }
-
-    return null;
+    return new CurrentUser(null);
   }
 }

@@ -16,5 +16,9 @@
     <label style="font-style: italic; font-size: medium;color: blue">Transaction is made</label>
 </form>
 
+<form method="get" action="/BankController.do">
+    <input type="submit" value="Back">
+</form>
+
 </body>
 </html>
