@@ -1,12 +1,9 @@
 package com.clouway.bank.persistence;
 
 import com.clouway.bank.core.Account;
-import com.clouway.bank.core.ClockUtil;
 import com.clouway.bank.core.User;
 import com.google.inject.util.Providers;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,23 +15,19 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
-public class PersistentBankTest {
+public class PersistentBankServiceTest {
 
-  Mockery context = new JUnit4Mockery();
+  PersistentAccountService accountService;
   PersistentBankService bankService;
   User user;
   Account account;
   MysqlConnectionPoolDataSource dataSource;
   Connection connection;
 
-  ClockUtil clockUtil = context.mock(ClockUtil.class);
-
-
-
   @Before
   public void setUp() throws Exception {
-    account = new Account("10.00");
-    user = new User("Torbalan","unknown",account,"someId");
+    account = new Account("5.00");
+    user = new User("Torbalan", "unknown", account, "someId");
     dataSource = new MysqlConnectionPoolDataSource();
 
     dataSource.setUser("root");
@@ -43,32 +36,28 @@ public class PersistentBankTest {
     dataSource.setServerName("localhost");
 
     connection = dataSource.getConnection();
-    bankService = new PersistentBankService(Providers.of(connection),clockUtil);
+    bankService = new PersistentBankService(Providers.of(connection));
+    accountService = new PersistentAccountService(Providers.of(connection));
 
-    bankService.cleanSessionsTable();
-    bankService.cleanAccountsTable();
-    bankService.registerUser(user);
+    accountService.cleanAccountsTable();
+    accountService.registerUser(user);
   }
 
   @Test
-  public void depositSuccess() {
+  public void depositSuccessful() {
     bankService.deposit(user);
-    assertThat(bankService.getAccountAmount(user),is(10.0));
+    assertThat(accountService.getAccountAmount(user), is(5.0));
   }
 
   @Test
-  public void withdraw() {
+  public void withdrawSuccessful() {
+    account = new Account("5.00");
+    user = new User("Torbalan", "unknown", account, "someId");
+  }
+
+  @Test
+  public void withdrawMoreThenAvailableAmount() {
     bankService.withdraw(user);
-    assertThat(bankService.getAccountAmount(user),is(0.0));
-  }
-
-  @Test
-  public void userExist() {
-    assertThat(bankService.userExists(user),is(true));
-  }
-
-  @Test
-  public void userNotExist() {
-    assertThat(bankService.userExists(new User("Ivan")),is(false));
+    assertThat(accountService.getAccountAmount(user), is(0.0));
   }
 }

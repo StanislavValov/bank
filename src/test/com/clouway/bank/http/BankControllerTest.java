@@ -39,7 +39,7 @@ public class BankControllerTest {
   }
 
   @Test
-  public void amountIsNotCorrect() throws Exception {
+  public void transactionAmountIsNotCorrect() throws Exception {
 
     context.checking(new Expectations() {
       {

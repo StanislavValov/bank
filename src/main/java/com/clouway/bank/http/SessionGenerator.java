@@ -9,7 +9,7 @@ import com.google.common.hash.Hashing;
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 
-public class SessionIdGenerator implements Session {
+public class SessionGenerator implements Session {
 
   @Override
   public String getId(String userName, String password){

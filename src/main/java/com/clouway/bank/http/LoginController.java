@@ -41,7 +41,7 @@ public class LoginController extends HttpServlet {
 
     if (authenticate == null) {
       req.setAttribute(siteMap.errorLabel(), siteMap.identificationFailed());
-      req.getRequestDispatcher(siteMap.loginJspLabel()).include(req, resp);
+      req.getRequestDispatcher(siteMap.loginJspLabel()).forward(req, resp);
 
     } else {
       req.setAttribute(siteMap.userName(), userName);

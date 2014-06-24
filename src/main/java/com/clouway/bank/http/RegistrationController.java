@@ -34,7 +34,10 @@ public class RegistrationController extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-    User user = new User(req.getParameter(siteMap.userName()), req.getParameter(siteMap.password()), null, null);
+    String userName = req.getParameter(siteMap.userName());
+    String password = req.getParameter(siteMap.password());
+
+    User user = new User(userName, password);
 
     if (validator.userDataAreValid(user)) {
 

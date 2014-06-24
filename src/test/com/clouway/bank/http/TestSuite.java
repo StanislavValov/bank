@@ -12,9 +12,9 @@ import org.junit.runners.Suite;
         BankControllerTest.class,
         LoginControllerTest.class,
         RegistrationControllerTest.class,
-        LogoutController.class,
-        SecurityFilter.class,
-        UserAccountController.class
+        LogoutControllerTest.class,
+        SecurityFilterTest.class,
+        UserAccountControllerTest.class
 })
 public class TestSuite {
 }

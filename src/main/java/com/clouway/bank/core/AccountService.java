@@ -10,8 +10,4 @@ public interface AccountService {
   boolean userExists(User user);
 
   void registerUser(User user);
-
-  void cleanAccountsTable();
-
-  void cleanSessionsTable();
 }
