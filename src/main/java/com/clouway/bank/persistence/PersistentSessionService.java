@@ -2,6 +2,7 @@ package com.clouway.bank.persistence;
 
 import com.clouway.bank.core.ClockUtil;
 import com.clouway.bank.core.User;
+import com.clouway.bank.http.AuthorisationService;
 import com.clouway.bank.http.SessionService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -12,14 +13,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @Singleton
-public class PersistentSessionService implements SessionService{
+public class PersistentSessionService implements SessionService,AuthorisationService {
 
   private final Provider<Connection> connectionProvider;
   private ClockUtil clockUtil;
@@ -31,39 +30,13 @@ public class PersistentSessionService implements SessionService{
   }
 
   @Override
-  public List<String> getSessionIds(String userName) {
-    PreparedStatement preparedStatement = null;
-    String sql = "select sessionId from sessions where userName=?";
-    List<String> id = new ArrayList<String>();
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1, userName);
-      preparedStatement.execute();
-      while (preparedStatement.getResultSet().next()) {
-        id.add(preparedStatement.getResultSet().getString("sessionId"));
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-    if (preparedStatement != null) {
-      try {
-        preparedStatement.close();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-    }
-    return id;
-  }
-
-
-  @Override
-  public void removeSessionId(User user) {
+  public void removeSessionId(String sessionId) {
     PreparedStatement preparedStatement = null;
     String sql = "delete from sessions where sessionId=?";
 
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1, user.getSessionId());
+      preparedStatement.setString(1, sessionId);
       preparedStatement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -78,16 +51,16 @@ public class PersistentSessionService implements SessionService{
   }
 
   @Override
-  public User findUserAssociatedWithSession(String userName) {
+  public User findUserAssociatedWithSession(String sessionId) {
     PreparedStatement preparedStatement = null;
-    String sql = "select userName,sessionId from sessions where userName=?";
+    String sql = "select userName,sessionId from sessions where sessionId=?";
     User searchedUser = null;
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1, userName);
+      preparedStatement.setString(1, sessionId);
       preparedStatement.execute();
       while (preparedStatement.getResultSet().next()) {
-        searchedUser = new User(preparedStatement.getResultSet().getString("userName"), null, null,
+        searchedUser = new User(preparedStatement.getResultSet().getString("userName"), null,
                 preparedStatement.getResultSet().getString("sessionId"));
       }
     } catch (SQLException e) {
@@ -104,12 +77,12 @@ public class PersistentSessionService implements SessionService{
   }
 
   @Override
-  public Timestamp getSessionExpirationTime(User user) {
+  public Timestamp getSessionExpirationTime(String sessionId) {
     PreparedStatement preparedStatement = null;
-    String sql = "SELECT expirationDate from sessions where userName=?";
+    String sql = "SELECT expirationDate from sessions where sessionId=?";
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1, user.getUserName());
+      preparedStatement.setString(1, sessionId);
       preparedStatement.execute();
       while (preparedStatement.getResultSet().next()) {
         return preparedStatement.getResultSet().getTimestamp("expirationDate");
@@ -128,14 +101,14 @@ public class PersistentSessionService implements SessionService{
   }
 
   @Override
-  public void resetSessionLife(User user) {
+  public void resetSessionLife(String sessionId) {
     PreparedStatement preparedStatement = null;
     String sql = "UPDATE sessions set expirationDate=? where sessionId=?";
 
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
       preparedStatement.setTimestamp(1, clockUtil.expirationDate());
-      preparedStatement.setString(2, user.getSessionId());
+      preparedStatement.setString(2, sessionId);
       preparedStatement.execute();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -165,7 +138,7 @@ public class PersistentSessionService implements SessionService{
 
       while (preparedStatement.getResultSet().next()) {
         if (preparedStatement.getResultSet().getString("password").equals(user.getPassword())){
-          cookie = new Cookie(preparedStatement.getResultSet().getString("userName"),user.getSessionId());
+          cookie = new Cookie("sid",user.getSessionId());
           addUserAssociatedWithSession(user);
         }
       }
@@ -180,6 +153,26 @@ public class PersistentSessionService implements SessionService{
       }
     }
     return cookie;
+  }
+
+  @Override
+  public int getSessionsCount(){
+    PreparedStatement preparedStatement = null;
+
+    String sql = "select COUNT(*) from sessions limit 1";
+
+    try {
+      preparedStatement = connectionProvider.get().prepareStatement(sql);
+      preparedStatement.execute();
+
+      while (preparedStatement.getResultSet().next()){
+        return preparedStatement.getResultSet().getInt("COUNT(*)");
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return 0;
   }
 
   public void cleanSessionsTable() {

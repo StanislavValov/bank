@@ -13,10 +13,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
-
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
@@ -30,27 +26,16 @@ public class LoginControllerTest {
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
-  SessionService sessionService = context.mock(SessionService.class);
+  AuthorisationService authorisationService = context.mock(AuthorisationService.class);
   Session session = context.mock(Session.class);
 
 
   @Before
   public void setUp() throws Exception {
-    user = new User("Torbalan", "unknown", null, "123");
+    user = new User("Torbalan", "unknown", "123");
     siteMap = new LabelMap();
     cookie = new Cookie(user.getUserName(),user.getSessionId());
-    loginController = new LoginController(sessionService, session, siteMap);
-  }
-
-
-  @Test
-  public void objectsAreEqual() {
-    assertThat(user,is((new User("Torbalan","unknown",null, "123"))));
-  }
-
-  @Test
-  public void objectsAreNotEqual() {
-    assertThat(user,is(not(new User("Tor", "known", null, "111"))));
+    loginController = new LoginController(authorisationService, session, siteMap);
   }
 
   @Test
@@ -67,7 +52,7 @@ public class LoginControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(sessionService).authenticate(user);
+        oneOf(authorisationService).authenticate(user);
         will(returnValue(cookie));
 
         oneOf(request).setAttribute(siteMap.userName(),user.getUserName());
@@ -94,7 +79,7 @@ public class LoginControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(sessionService).authenticate(user);
+        oneOf(authorisationService).authenticate(user);
 
         oneOf(request).setAttribute(siteMap.errorLabel(), siteMap.identificationFailed());
 

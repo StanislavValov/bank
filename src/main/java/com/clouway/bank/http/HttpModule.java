@@ -29,6 +29,7 @@ public class HttpModule extends ServletModule {
     serve("/UserAccountController.do").with(UserAccountController.class);
     serve("/LogoutController.do").with(LogoutController.class);
 
+
     bind(BankService.class).to(PersistentBankService.class);
     bind(AccountService.class).to(PersistentAccountService.class);
     bind(SessionService.class).to(PersistentSessionService.class);
@@ -36,6 +37,7 @@ public class HttpModule extends ServletModule {
     bind(BankValidator.class).to(Validator.class);
     bind(SiteMap.class).to(LabelMap.class);
     bind(ClockUtil.class).to(Clock.class);
+    bind(AuthorisationService.class).to(PersistentSessionService.class);
   }
 
   @Provides
@@ -45,18 +47,15 @@ public class HttpModule extends ServletModule {
 
   @Provides
   @RequestScoped
-  public CurrentUser getCurrentUser(Provider<HttpServletRequest> requestProvider, SessionService sessionService) {
+  public CurrentUser getCurrentUser(Provider<HttpServletRequest> requestProvider, SessionService sessionService, SiteMap siteMap) {
     Cookie[] cookies = requestProvider.get().getCookies();
 
-    if (cookies!=null) {
+    if (cookies != null) {
       for (Cookie cookie : cookies) {
-        for (int i = 0; i < sessionService.getSessionIds(cookie.getName()).size(); i++) {
 
-          if (cookie.getValue().equalsIgnoreCase((String) sessionService.getSessionIds(cookie.getName()).get(i))) {
-
-            User user = sessionService.findUserAssociatedWithSession(cookie.getName());
-            return new CurrentUser(user);
-          }
+        if (cookie.getName().equalsIgnoreCase(siteMap.cookieName())) {
+          User user = sessionService.findUserAssociatedWithSession(cookie.getValue());
+          return new CurrentUser(user);
         }
       }
     }

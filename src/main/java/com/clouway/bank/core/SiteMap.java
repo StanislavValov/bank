@@ -5,6 +5,8 @@ package com.clouway.bank.core;
  */
 public interface SiteMap {
 
+  String cookieName();
+
   String password();
 
   String userName();
@@ -22,7 +24,7 @@ public interface SiteMap {
 
   String withdrawLabel();
 
-  String amountLabel();
+  String transactionAmountLabel();
 
   String successfulTransactionLabel();
 
@@ -40,4 +42,6 @@ public interface SiteMap {
   String validateErrorMessage();
 
   String registrationJspLabel();
+
+  String logoutController();
 }

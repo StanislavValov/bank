@@ -14,6 +14,8 @@ public class CalendarUtil {
 
     calendar.set(Calendar.YEAR, year);
     calendar.set(Calendar.DAY_OF_MONTH, day);
+    calendar.set(Calendar.MILLISECOND,0);
+    calendar.set(Calendar.SECOND,0);
     Date date = calendar.getTime();
 
     return new Timestamp(date.getTime());

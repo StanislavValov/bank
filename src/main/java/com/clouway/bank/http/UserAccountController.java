@@ -36,13 +36,13 @@ public class UserAccountController extends HttpServlet {
     String userName = (String) req.getAttribute(siteMap.userName());
     User user = new User(userName);
 
-    req.setAttribute(siteMap.amountLabel(), accountService.getAccountAmount(user));
+    req.setAttribute(siteMap.transactionAmountLabel(), accountService.getAccountAmount(user));
     req.getRequestDispatcher(siteMap.userJspLabel()).include(req, resp);
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    req.setAttribute(siteMap.amountLabel(), accountService.getAccountAmount(currentUserProvider.get().getUser()));
+    req.setAttribute(siteMap.transactionAmountLabel(), accountService.getAccountAmount(currentUserProvider.get().getUser()));
     req.getRequestDispatcher(siteMap.userJspLabel()).include(req, resp);
   }
 }

@@ -1,6 +1,5 @@
 package com.clouway.bank.http;
 
-import com.clouway.bank.core.Account;
 import com.clouway.bank.core.BankService;
 import com.clouway.bank.core.BankValidator;
 import com.clouway.bank.core.CurrentUser;
@@ -39,18 +38,18 @@ public class BankController extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-    Account account = new Account(req.getParameter(siteMap.amountLabel()));
+    String amount = req.getParameter(siteMap.transactionAmountLabel());
 
-    User user = new User(currentUserProvider.get().getUser().getUserName(), account);
+    User user = currentUserProvider.get().getUser();
 
-    if (validator.transactionIsValid(user)) {
+    if (validator.isAmountValid(amount)) {
 
       if (req.getParameter(siteMap.depositLabel()) != null) {
-        bankService.deposit(user);
+        bankService.deposit(user, amount);
       }
 
       if (req.getParameter(siteMap.withdrawLabel()) != null) {
-        bankService.withdraw(user);
+        bankService.withdraw(user, amount);
       }
 
       resp.sendRedirect(siteMap.successfulTransactionLabel());

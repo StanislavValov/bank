@@ -1,6 +1,6 @@
 package com.clouway.bank.persistence;
 
-import com.clouway.bank.core.Account;
+import com.clouway.bank.core.Clock;
 import com.clouway.bank.core.User;
 import com.google.inject.util.Providers;
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
@@ -15,18 +15,17 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
-public class PersistentAccountServiceTest {
+public class PersistentAccountServiceIT {
 
   PersistentAccountService accountService;
+  PersistentSessionService sessionService;
   User user;
-  Account account;
   MysqlConnectionPoolDataSource dataSource;
   Connection connection;
 
   @Before
   public void setUp() throws Exception {
-    account = new Account("5.00");
-    user = new User("Torbalan", "unknown", account, "someId");
+    user = new User("Ivan", "unknown", "someId");
     dataSource = new MysqlConnectionPoolDataSource();
 
     dataSource.setUser("root");
@@ -36,7 +35,9 @@ public class PersistentAccountServiceTest {
 
     connection = dataSource.getConnection();
     accountService = new PersistentAccountService(Providers.of(connection));
+    sessionService = new PersistentSessionService(Providers.of(connection),new Clock());
 
+    sessionService.cleanSessionsTable();
     accountService.cleanAccountsTable();
     accountService.registerUser(user);
   }
@@ -48,7 +49,7 @@ public class PersistentAccountServiceTest {
 
   @Test
   public void userNotExist() {
-    assertThat(accountService.userExists(new User("Ivan")), is(false));
+    assertThat(accountService.userExists(new User("Hulk")), is(false));
   }
 
   @Test

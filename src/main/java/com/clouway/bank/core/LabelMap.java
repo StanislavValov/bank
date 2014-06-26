@@ -6,6 +6,11 @@ package com.clouway.bank.core;
 public class LabelMap implements SiteMap {
 
   @Override
+  public String cookieName() {
+    return "sid";
+  }
+
+  @Override
   public String password() {
     return "password";
   }
@@ -46,7 +51,7 @@ public class LabelMap implements SiteMap {
   }
 
   @Override
-  public String amountLabel() {
+  public String transactionAmountLabel() {
     return "amount";
   }
 
@@ -88,6 +93,11 @@ public class LabelMap implements SiteMap {
   @Override
   public String registrationJspLabel(){
     return "/bank/RegistrationForm.jsp";
+  }
+
+  @Override
+  public String logoutController(){
+    return "/LogoutController.do";
   }
 
 }

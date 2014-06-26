@@ -16,7 +16,7 @@ public class Clock implements ClockUtil {
   }
 
   @Override
-  public Timestamp currentTime(){
+  public Timestamp currentTime() {
     return new Timestamp(System.currentTimeMillis());
   }
 }

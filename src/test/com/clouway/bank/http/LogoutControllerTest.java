@@ -38,7 +38,7 @@ public class LogoutControllerTest {
   @Before
   public void setUp() throws Exception {
     logoutController = new LogoutController(currentUserProvider,sessionService,siteMap);
-    user = new User("Torbalan", "unknown", null, "123");
+    user = new User("Torbalan", "unknown", "123");
     cookie = new Cookie("Torbalan","123");
     cookies = new Cookie[]{cookie};
     currentUser = new CurrentUser(user);
@@ -55,7 +55,7 @@ public class LogoutControllerTest {
         oneOf(currentUserProvider).get();
         will(returnValue(currentUser));
 
-        oneOf(sessionService).removeSessionId(user);
+        oneOf(sessionService).removeSessionId(user.getSessionId());
 
         oneOf(response).addCookie(cookie);
 

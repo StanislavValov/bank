@@ -8,23 +8,16 @@ public class User {
 
   private String userName;
   private String password;
-  private Account account;
   private String sessionId;
 
-  public User(String userName, String password, Account account, String sessionId) {
+  public User(String userName, String password, String sessionId) {
     this.userName = userName;
     this.password = password;
-    this.account = account;
     this.sessionId = sessionId;
   }
 
   public User(String userName) {
     this.userName = userName;
-  }
-
-  public User(String userName, Account account) {
-    this.userName = userName;
-    this.account = account;
   }
 
   public User(String userName, String password) {
@@ -38,10 +31,6 @@ public class User {
 
   public String getPassword() {
     return password;
-  }
-
-  public Account getAccount() {
-    return account;
   }
 
   public String getSessionId() {

@@ -18,13 +18,13 @@ import java.io.IOException;
 @Singleton
 public class LoginController extends HttpServlet {
 
-  private SessionService sessionService;
+  private AuthorisationService authorisationService;
   private Session session;
   private SiteMap siteMap;
 
   @Inject
-  public LoginController(SessionService sessionService, Session session, SiteMap siteMap) {
-    this.sessionService = sessionService;
+  public LoginController(AuthorisationService authorisationService, Session session, SiteMap siteMap) {
+    this.authorisationService = authorisationService;
     this.session = session;
     this.siteMap = siteMap;
   }
@@ -35,17 +35,17 @@ public class LoginController extends HttpServlet {
     String userName = req.getParameter(siteMap.userName());
     String sessionId = session.getId(userName, password);
 
-    User user = new User(userName, password, null, sessionId);
+    User user = new User(userName, password, sessionId);
 
-    Cookie authenticate = sessionService.authenticate(user);
+    Cookie cookie = authorisationService.authenticate(user);
 
-    if (authenticate == null) {
+    if (cookie == null) {
       req.setAttribute(siteMap.errorLabel(), siteMap.identificationFailed());
       req.getRequestDispatcher(siteMap.loginJspLabel()).forward(req, resp);
 
     } else {
       req.setAttribute(siteMap.userName(), userName);
-      resp.addCookie(authenticate);
+      resp.addCookie(cookie);
       req.getRequestDispatcher(siteMap.userAccountController()).forward(req, resp);
     }
   }

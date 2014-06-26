@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 
@@ -27,6 +28,7 @@ public class SecurityFilterTest {
   SiteMap siteMap;
   User user;
   CurrentUser currentUser;
+  Cookie cookie;
 
   ServletRequest request = context.mock(ServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
@@ -37,7 +39,7 @@ public class SecurityFilterTest {
 
   @Before
   public void setUp() throws Exception {
-    user = new User("Torbalan", "unknown", null, "111");
+    user = new User("Torbalan", "unknown", "111");
     currentUser = new CurrentUser(user);
     siteMap = new LabelMap();
     securityFilter = new SecurityFilter(provider, sessionService, siteMap, clockUtil);
@@ -58,7 +60,7 @@ public class SecurityFilterTest {
   }
 
   @Test
-  public void sessionExpired() throws Exception {
+  public void sessionWasExpired() throws Exception {
 
     final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() - 5 * 60 * 1000);
     final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
@@ -68,15 +70,13 @@ public class SecurityFilterTest {
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-        oneOf(sessionService).getSessionExpirationTime(user);
+        oneOf(sessionService).getSessionExpirationTime(user.getSessionId());
         will(returnValue(expirationTIme));
 
         oneOf(clockUtil).currentTime();
         will(returnValue(currentTime));
 
-        oneOf(sessionService).removeSessionId(user);
-
-        oneOf(response).sendRedirect(siteMap.loginJspLabel());
+        oneOf(request).getRequestDispatcher(siteMap.logoutController());
       }
     });
     securityFilter.doFilter(request, response, filterChain);
@@ -92,13 +92,13 @@ public class SecurityFilterTest {
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-        oneOf(sessionService).getSessionExpirationTime(user);
+        oneOf(sessionService).getSessionExpirationTime(user.getSessionId());
         will(returnValue(expirationTIme));
 
         oneOf(clockUtil).currentTime();
         will(returnValue(currentTime));
 
-        oneOf(sessionService).resetSessionLife(user);
+        oneOf(sessionService).resetSessionLife(user.getSessionId());
 
         oneOf(filterChain).doFilter(request, response);
       }

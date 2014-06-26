@@ -47,7 +47,7 @@ public class UserAccountControllerTest {
         oneOf(accountService).getAccountAmount(user);
         will(returnValue(100.00));
 
-        oneOf(request).setAttribute(siteMap.amountLabel(),100.00);
+        oneOf(request).setAttribute(siteMap.transactionAmountLabel(),100.00);
 
         oneOf(request).getRequestDispatcher(siteMap.userJspLabel());
       }

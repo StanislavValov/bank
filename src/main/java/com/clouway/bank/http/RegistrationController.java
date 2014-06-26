@@ -39,7 +39,7 @@ public class RegistrationController extends HttpServlet {
 
     User user = new User(userName, password);
 
-    if (validator.userDataAreValid(user)) {
+    if (validator.isDataCorrect(user)) {
 
       if (!accountService.userExists(user)) {
         accountService.registerUser(user);

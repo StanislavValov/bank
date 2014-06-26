@@ -39,9 +39,10 @@ public class LogoutController extends HttpServlet {
     for (Cookie cookie : cookies) {
 
       User currentUser = currentUserProvider.get().getUser();
+
       if (currentUser.getSessionId().equalsIgnoreCase(cookie.getValue())) {
         cookie.setMaxAge(0);
-        sessionService.removeSessionId(currentUser);
+        sessionService.removeSessionId(currentUser.getSessionId());
         resp.addCookie(cookie);
       }
     }

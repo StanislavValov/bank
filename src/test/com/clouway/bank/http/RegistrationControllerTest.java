@@ -33,7 +33,7 @@ public class RegistrationControllerTest {
   @Before
   public void setUp() throws Exception {
     siteMap = new LabelMap();
-    user = new User("Torbalan","unknown",null,null);
+    user = new User("Torbalan","unknown",null);
     registrationController = new RegistrationController(accountService,bankValidator,siteMap);
   }
 
@@ -48,7 +48,7 @@ public class RegistrationControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(bankValidator).userDataAreValid(user);
+        oneOf(bankValidator).isDataCorrect(user);
         will(returnValue(true));
 
         oneOf(accountService).userExists(user);
@@ -75,7 +75,7 @@ public class RegistrationControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(bankValidator).userDataAreValid(user);
+        oneOf(bankValidator).isDataCorrect(user);
         will(returnValue(false));
 
         oneOf(request).setAttribute(siteMap.errorLabel(),siteMap.validateErrorMessage());
@@ -87,7 +87,7 @@ public class RegistrationControllerTest {
   }
 
   @Test
-  public void userExists() throws Exception {
+  public void userAlreadyExists() throws Exception {
 
     context.checking(new Expectations(){
       {
@@ -97,7 +97,7 @@ public class RegistrationControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(bankValidator).userDataAreValid(user);
+        oneOf(bankValidator).isDataCorrect(user);
         will(returnValue(true));
 
         oneOf(accountService).userExists(user);

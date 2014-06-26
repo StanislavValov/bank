@@ -1,3 +1,5 @@
+<%@ page import="com.clouway.bank.http.SessionService" %>
+<%@ page import="com.clouway.bank.persistence.PersistentSessionService" %>
 <%--
   Created by IntelliJ IDEA.
   User: clouway
@@ -38,6 +40,7 @@
             }
         %>
     </p>
+
 </form>
 
 </body>

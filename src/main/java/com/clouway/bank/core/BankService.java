@@ -5,7 +5,7 @@ package com.clouway.bank.core;
  */
 public interface BankService {
 
-  void deposit(User user);
+  void deposit(User user, String amount);
 
-  void withdraw(User user);
+  void withdraw(User user, String amount);
 }

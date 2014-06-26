@@ -24,12 +24,12 @@ public class PersistentBankService implements BankService {
   }
 
   @Override
-  public void deposit(User user) {
+  public void deposit(User user, String amount) {
     PreparedStatement preparedStatement = null;
     try {
       preparedStatement = connectionProvider.get().prepareStatement
               ("update accounts set amount=amount+? where userName=?");
-      preparedStatement.setString(1, user.getAccount().getTransactionAmount());
+      preparedStatement.setString(1, amount);
       preparedStatement.setString(2, user.getUserName());
       preparedStatement.execute();
     } catch (SQLException e) {
@@ -45,12 +45,12 @@ public class PersistentBankService implements BankService {
   }
 
   @Override
-  public void withdraw(User user) {
+  public void withdraw(User user, String amount) {
     PreparedStatement preparedStatement = null;
     try {
       preparedStatement = connectionProvider.get().prepareStatement
-              ("update accounts set amount=amount-? where userName=? and " + user.getAccount().getTransactionAmount() + " <= amount");
-      preparedStatement.setString(1, user.getAccount().getTransactionAmount());
+              ("update accounts set amount=amount-? where userName=? and " + amount + " <= amount");
+      preparedStatement.setString(1, amount);
       preparedStatement.setString(2, user.getUserName());
       preparedStatement.execute();
     } catch (SQLException e) {

@@ -20,7 +20,7 @@ public class BankControllerTest {
   BankController bankController = null;
   User user;
   SiteMap siteMap;
-  Account account;
+  String amount;
   CurrentUser currentUser;
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
@@ -32,8 +32,8 @@ public class BankControllerTest {
   @Before
   public void setUp() throws Exception {
     siteMap = new LabelMap();
-    account = new Account("10.101");
-    user = new User("Ivan", account);
+    amount = "10.101";
+    user = new User("Ivan", amount);
     currentUser = new CurrentUser(user);
     bankController = new BankController(bankService, bankValidator,provider,siteMap);
   }
@@ -43,13 +43,13 @@ public class BankControllerTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(request).getParameter(siteMap.amountLabel());
-        will(returnValue(account.getTransactionAmount()));
+        oneOf(request).getParameter(siteMap.transactionAmountLabel());
+        will(returnValue(amount));
 
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-        oneOf(bankValidator).transactionIsValid(user);
+        oneOf(bankValidator).isAmountValid(amount);
         will(returnValue(false));
 
         oneOf(request).setAttribute(siteMap.amountErrorLabel(),siteMap.amountErrorMessage());
@@ -65,19 +65,19 @@ public class BankControllerTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(request).getParameter(siteMap.amountLabel());
-        will(returnValue(account.getTransactionAmount()));
+        oneOf(request).getParameter(siteMap.transactionAmountLabel());
+        will(returnValue(amount));
 
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-        oneOf(bankValidator).transactionIsValid(user);
+        oneOf(bankValidator).isAmountValid(amount);
         will(returnValue(true));
 
         oneOf(request).getParameter(siteMap.depositLabel());
         will(returnValue(siteMap.depositLabel()));
 
-        oneOf(bankService).deposit(user);
+        oneOf(bankService).deposit(user,amount);
 
         oneOf(request).getParameter(siteMap.withdrawLabel());
         will(returnValue(null));
@@ -93,13 +93,13 @@ public class BankControllerTest {
 
     context.checking(new Expectations(){
       {
-        oneOf(request).getParameter(siteMap.amountLabel());
-        will(returnValue(account.getTransactionAmount()));
+        oneOf(request).getParameter(siteMap.transactionAmountLabel());
+        will(returnValue(amount));
 
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-        oneOf(bankValidator).transactionIsValid(user);
+        oneOf(bankValidator).isAmountValid(amount);
         will(returnValue(true));
 
         oneOf(request).getParameter(siteMap.depositLabel());
@@ -108,7 +108,7 @@ public class BankControllerTest {
         oneOf(request).getParameter(siteMap.withdrawLabel());
         will(returnValue(siteMap.withdrawLabel()));
 
-        oneOf(bankService).withdraw(user);
+        oneOf(bankService).withdraw(user,amount);
 
         oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
       }

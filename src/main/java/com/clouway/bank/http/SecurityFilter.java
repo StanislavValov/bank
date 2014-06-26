@@ -25,14 +25,14 @@ import java.sql.Timestamp;
 public class SecurityFilter implements Filter {
 
   private Provider<CurrentUser> currentUserProvider;
-  private SessionService accountService;
+  private SessionService sessionService;
   private SiteMap siteMap;
   private ClockUtil clockUtil;
 
   @Inject
   public SecurityFilter(Provider<CurrentUser> currentUserProvider, SessionService sessionService, SiteMap siteMap, ClockUtil clockUtil) {
     this.currentUserProvider = currentUserProvider;
-    this.accountService = sessionService;
+    this.sessionService = sessionService;
     this.siteMap = siteMap;
     this.clockUtil = clockUtil;
   }
@@ -50,21 +50,22 @@ public class SecurityFilter implements Filter {
     User user = currentUserProvider.get().getUser();
 
     if (user != null) {
-      Timestamp expirationTime = accountService.getSessionExpirationTime(user);
+      Timestamp expirationTime = sessionService.getSessionExpirationTime(user.getSessionId());
 
       if (expirationTime.before(clockUtil.currentTime())) {
-        accountService.removeSessionId(user);
-        httpResponse.sendRedirect(siteMap.loginJspLabel());
+
+        servletRequest.getRequestDispatcher(siteMap.logoutController()).forward(servletRequest, httpResponse);
 
       } else {
-        accountService.resetSessionLife(user);
+
+        sessionService.resetSessionLife(user.getSessionId());
         filterChain.doFilter(servletRequest, servletResponse);
       }
-    }
-    else {
+    } else {
       httpResponse.sendRedirect(siteMap.loginJspLabel());
     }
   }
+
   @Override
   public void destroy() {
 
