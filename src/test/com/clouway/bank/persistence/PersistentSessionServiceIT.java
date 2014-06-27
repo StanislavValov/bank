@@ -63,13 +63,18 @@ public class PersistentSessionServiceIT {
   }
 
   @Test
-  public void getSessionExpirationTime() {
-//    assertThat(sessionService.getSessionsExpirationTime(user.getSessionId()),is(CalendarUtil.june(2014,5)));
+  public void getSessionsExpirationTime() {
+    assertThat(sessionService.getSessionsExpirationTime().get(user.getSessionId()),is(CalendarUtil.june(2014,5)));
   }
 
   @Test
-  public void resetSessionLife() {
+  public void sessionLifeWasReset() {
     sessionService.resetSessionLife(user.getSessionId());
-//    assertThat(sessionService.getSessionsExpirationTime(user.getSessionId()),is(CalendarUtil.june(2014,5)));
+    assertThat(sessionService.getSessionsExpirationTime().get(user.getSessionId()),is(CalendarUtil.june(2014,5)));
+  }
+
+  @Test
+  public void removeSessionIdSuccessful() {
+
   }
 }

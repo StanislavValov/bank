@@ -14,9 +14,10 @@ import org.junit.Test;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -28,7 +29,7 @@ public class SecurityFilterTest {
   SiteMap siteMap;
   User user;
   CurrentUser currentUser;
-  Cookie cookie;
+  Map<String,Timestamp> sessionsExpirationTime;
 
   ServletRequest request = context.mock(ServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
@@ -39,6 +40,7 @@ public class SecurityFilterTest {
 
   @Before
   public void setUp() throws Exception {
+    sessionsExpirationTime = new HashMap<String, Timestamp>();
     user = new User("Torbalan", "unknown", "111");
     currentUser = new CurrentUser(user);
     siteMap = new LabelMap();
@@ -62,19 +64,22 @@ public class SecurityFilterTest {
   @Test
   public void sessionWasExpired() throws Exception {
 
-    final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() - 5 * 60 * 1000);
+    final Timestamp expirationTime = new Timestamp(System.currentTimeMillis() - 5 * 60 * 1000);
     final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+    sessionsExpirationTime.put(user.getSessionId(), expirationTime);
 
     context.checking(new Expectations() {
       {
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-//        oneOf(sessionService).getSessionsExpirationTime(user.getSessionId());
-        will(returnValue(expirationTIme));
+        oneOf(sessionService).getSessionsExpirationTime();
+        will(returnValue(sessionsExpirationTime));
 
         oneOf(clockUtil).currentTime();
         will(returnValue(currentTime));
+
+        oneOf(sessionService).removeSessionId(user.getSessionId());
 
         oneOf(request).getRequestDispatcher(siteMap.logoutController());
       }
@@ -83,17 +88,19 @@ public class SecurityFilterTest {
   }
 
   @Test
-  public void sessionIsActive() throws Exception {
+  public void sessionWasReset() throws Exception {
+
     final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000);
     final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+    sessionsExpirationTime.put(user.getSessionId(), expirationTIme);
 
     context.checking(new Expectations() {
       {
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-//        oneOf(sessionService).getSessionsExpirationTime(user.getSessionId());
-        will(returnValue(expirationTIme));
+        oneOf(sessionService).getSessionsExpirationTime();
+        will(returnValue(sessionsExpirationTime));
 
         oneOf(clockUtil).currentTime();
         will(returnValue(currentTime));
@@ -104,5 +111,31 @@ public class SecurityFilterTest {
       }
     });
     securityFilter.doFilter(request, response, filterChain);
+  }
+
+  @Test
+  public void expiredSessionWasDeleted() throws Exception {
+
+    final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis()-1);
+    final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+    sessionsExpirationTime.put(user.getSessionId(),expirationTIme);
+
+    context.checking(new Expectations(){
+      {
+        oneOf(provider).get();
+        will(returnValue(currentUser));
+
+        oneOf(sessionService).getSessionsExpirationTime();
+        will(returnValue(sessionsExpirationTime));
+
+        oneOf(clockUtil).currentTime();
+        will(returnValue(currentTime));
+
+        oneOf(request).getRequestDispatcher(siteMap.logoutController());
+
+        oneOf(sessionService).removeSessionId(user.getSessionId());
+      }
+    });
+    securityFilter.doFilter(request,response,filterChain);
   }
 }

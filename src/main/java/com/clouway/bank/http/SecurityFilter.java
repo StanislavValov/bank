@@ -48,34 +48,31 @@ public class SecurityFilter implements Filter {
 
     HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-
     User user = currentUserProvider.get().getUser();
+    Map<String, Timestamp> sessionsExpirationTime = sessionService.getSessionsExpirationTime();
+    Timestamp currentTime = clockUtil.currentTime();
 
     if (user != null) {
-      Map<String, Timestamp> expirationTime = sessionService.getSessionsExpirationTime();
 
-      if (expirationTime.get(user.getSessionId()).before(clockUtil.currentTime())) {
+      if (sessionsExpirationTime.get(user.getSessionId()).before(currentTime)) {
 
         servletRequest.getRequestDispatcher(siteMap.logoutController()).forward(servletRequest, response);
 
       } else {
-
         sessionService.resetSessionLife(user.getSessionId());
         filterChain.doFilter(servletRequest, servletResponse);
       }
 
-      for (String sessionId : expirationTime.keySet()) {
-        if (expirationTime.get(sessionId).before(clockUtil.currentTime())) {
-          sessionService.removeSessionId(sessionId);
-        }
-      }
     } else {
       response.sendRedirect(siteMap.loginJspLabel());
     }
 
-
+    for (String sessionId : sessionsExpirationTime.keySet()) {
+      if (sessionsExpirationTime.get(sessionId).before(currentTime)) {
+        sessionService.removeSessionId(sessionId);
+      }
+    }
   }
-
 
   @Override
   public void destroy() {
