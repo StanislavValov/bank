@@ -27,15 +27,13 @@ public class LoginControllerTest {
   HttpServletRequest request = context.mock(HttpServletRequest.class);
   HttpServletResponse response = context.mock(HttpServletResponse.class);
   AuthorisationService authorisationService = context.mock(AuthorisationService.class);
-  Session session = context.mock(Session.class);
-
 
   @Before
   public void setUp() throws Exception {
     user = new User("Torbalan", "unknown", "123");
     siteMap = new LabelMap();
     cookie = new Cookie(user.getUserName(), user.getSessionId());
-    loginController = new LoginController(authorisationService, session, siteMap);
+    loginController = new LoginController(authorisationService, siteMap);
   }
 
   @Test
@@ -43,9 +41,6 @@ public class LoginControllerTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(session).getId(user.getUserName(), user.getPassword());
-        will(returnValue(user.getSessionId()));
-
         oneOf(request).getParameter(siteMap.password());
         will(returnValue(user.getPassword()));
 
@@ -70,9 +65,6 @@ public class LoginControllerTest {
 
     context.checking(new Expectations() {
       {
-        oneOf(session).getId(user.getUserName(), user.getPassword());
-        will(returnValue(user.getSessionId()));
-
         oneOf(request).getParameter(siteMap.password());
         will(returnValue(user.getPassword()));
 

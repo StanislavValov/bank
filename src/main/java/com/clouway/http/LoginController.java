@@ -19,13 +19,11 @@ import java.io.IOException;
 public class LoginController extends HttpServlet {
 
   private AuthorisationService authorisationService;
-  private Session session;
   private SiteMap siteMap;
 
   @Inject
-  public LoginController(AuthorisationService authorisationService, Session session, SiteMap siteMap) {
+  public LoginController(AuthorisationService authorisationService, SiteMap siteMap) {
     this.authorisationService = authorisationService;
-    this.session = session;
     this.siteMap = siteMap;
   }
 
@@ -33,9 +31,8 @@ public class LoginController extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String password = req.getParameter(siteMap.password());
     String userName = req.getParameter(siteMap.userName());
-    String sessionId = session.getId(userName, password);
 
-    User user = new User(userName, password, sessionId);
+    User user = new User(userName, password);
 
     Cookie cookie = authorisationService.authenticate(user);
 

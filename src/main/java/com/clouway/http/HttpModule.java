@@ -34,7 +34,6 @@ public class HttpModule extends ServletModule {
     bind(BankService.class).to(PersistentBankService.class);
     bind(AccountService.class).to(PersistentAccountService.class);
     bind(SessionService.class).to(PersistentSessionService.class);
-    bind(Session.class).to(SessionGenerator.class);
     bind(BankValidator.class).to(Validator.class);
     bind(SiteMap.class).to(LabelMap.class);
     bind(ClockUtil.class).to(Clock.class);

@@ -4,6 +4,9 @@ import com.clouway.core.ClockUtil;
 import com.clouway.core.User;
 import com.clouway.http.AuthorisationService;
 import com.clouway.http.SessionService;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -146,8 +149,8 @@ public class PersistentSessionService implements SessionService, AuthorisationSe
 
       while (preparedStatement.getResultSet().next()) {
         if (preparedStatement.getResultSet().getString("password").equals(user.getPassword())) {
-          cookie = new Cookie("sid", user.getSessionId());
-          addUserAssociatedWithSession(user);
+          cookie = new Cookie("sid", getId(user));
+          addUserAssociatedWithSession(user, cookie.getValue());
         }
       }
     } catch (SQLException e) {
@@ -213,11 +216,11 @@ public class PersistentSessionService implements SessionService, AuthorisationSe
     }
   }
 
-  private void addUserAssociatedWithSession(User user) {
+  private void addUserAssociatedWithSession(User user, String sessionId) {
     PreparedStatement preparedStatement = null;
     try {
       preparedStatement = connectionProvider.get().prepareStatement("insert into sessions values (?,?,?)");
-      preparedStatement.setString(1, user.getSessionId());
+      preparedStatement.setString(1, sessionId);
       preparedStatement.setTimestamp(2, clockUtil.expirationDate());
       preparedStatement.setString(3, user.getUserName());
       preparedStatement.execute();
@@ -232,5 +235,11 @@ public class PersistentSessionService implements SessionService, AuthorisationSe
         }
       }
     }
+  }
+
+  private String getId(User user) {
+    HashFunction hf = Hashing.sha1();
+    HashCode hashCode = hf.hashString(user.getUserName() + user.getPassword() + System.currentTimeMillis());
+    return hashCode.toString();
   }
 }
