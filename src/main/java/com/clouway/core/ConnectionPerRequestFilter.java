@@ -1,4 +1,4 @@
-package com.clouway.http;
+package com.clouway.core;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 
