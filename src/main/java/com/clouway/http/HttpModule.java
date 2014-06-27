@@ -1,9 +1,7 @@
 package com.clouway.http;
 
 import com.clouway.core.*;
-import com.clouway.persistence.PersistentAccountService;
-import com.clouway.persistence.PersistentBankService;
-import com.clouway.persistence.PersistentSessionService;
+import com.clouway.persistence.ConnectionPerRequestFilter;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.servlet.RequestScoped;
@@ -30,14 +28,9 @@ public class HttpModule extends ServletModule {
     serve("/UserAccountController.do").with(UserAccountController.class);
     serve("/LogoutController.do").with(LogoutController.class);
 
-
-    bind(BankService.class).to(PersistentBankService.class);
-    bind(AccountService.class).to(PersistentAccountService.class);
-    bind(SessionService.class).to(PersistentSessionService.class);
     bind(BankValidator.class).to(Validator.class);
     bind(SiteMap.class).to(LabelMap.class);
     bind(ClockUtil.class).to(Clock.class);
-    bind(AuthorisationService.class).to(PersistentSessionService.class);
   }
 
   @Provides
