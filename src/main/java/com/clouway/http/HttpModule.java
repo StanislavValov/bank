@@ -1,7 +1,7 @@
 package com.clouway.http;
 
 import com.clouway.core.*;
-import com.clouway.persistence.ConnectionPerRequestFilter;
+import com.clouway.core.ConnectionPerRequestFilter;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.servlet.RequestScoped;
