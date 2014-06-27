@@ -3,6 +3,7 @@ package com.clouway.bank.http;
 import com.clouway.bank.core.ClockUtil;
 import com.clouway.bank.core.CurrentUser;
 import com.clouway.bank.core.SiteMap;
+import com.clouway.bank.core.User;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -13,6 +14,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Map;
@@ -44,19 +46,36 @@ public class SecurityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-    Map<String, Timestamp> expirationTime = sessionService.getSessionsExpirationTime();
+    HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-    for (String session : expirationTime.keySet()) {
-      if (expirationTime.get(session).before(clockUtil.currentTime())) {
-        sessionService.removeSessionId(session);
+
+    User user = currentUserProvider.get().getUser();
+
+    if (user != null) {
+      Map<String, Timestamp> expirationTime = sessionService.getSessionsExpirationTime();
+
+      if (expirationTime.get(user.getSessionId()).before(clockUtil.currentTime())) {
+
+        servletRequest.getRequestDispatcher(siteMap.logoutController()).forward(servletRequest, response);
 
       } else {
-        sessionService.resetSessionLife(session);
+
+        sessionService.resetSessionLife(user.getSessionId());
+        filterChain.doFilter(servletRequest, servletResponse);
       }
 
-      filterChain.doFilter(servletRequest, servletResponse);
+      for (String sessionId : expirationTime.keySet()) {
+        if (expirationTime.get(sessionId).before(clockUtil.currentTime())) {
+          sessionService.removeSessionId(sessionId);
+        }
+      }
+    } else {
+      response.sendRedirect(siteMap.loginJspLabel());
     }
+
+
   }
+
 
   @Override
   public void destroy() {

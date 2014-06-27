@@ -20,7 +20,7 @@ import java.util.Map;
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @Singleton
-public class PersistentSessionService implements SessionService,AuthorisationService {
+public class PersistentSessionService implements SessionService, AuthorisationService {
 
   private final Provider<Connection> connectionProvider;
   private ClockUtil clockUtil;
@@ -79,16 +79,17 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
   }
 
   @Override
-  public Map<String,Timestamp> getSessionsExpirationTime() {
+  public Map<String, Timestamp> getSessionsExpirationTime() {
     PreparedStatement preparedStatement = null;
     String sql = "SELECT sessionId,expirationDate from sessions";
-    Map<String,Timestamp>expTime = new HashMap<String, Timestamp>();
+    Map<String, Timestamp> expTime = new HashMap<String, Timestamp>();
+
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
       preparedStatement.execute();
       while (preparedStatement.getResultSet().next()) {
-         expTime.put(preparedStatement.getResultSet().getString("sessionId"),
-                 preparedStatement.getResultSet().getTimestamp("expirationDate"));
+        expTime.put(preparedStatement.getResultSet().getString("sessionId")
+                , preparedStatement.getResultSet().getTimestamp("expirationDate"));
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -140,15 +141,15 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
       preparedStatement.execute();
 
       while (preparedStatement.getResultSet().next()) {
-        if (preparedStatement.getResultSet().getString("password").equals(user.getPassword())){
-          cookie = new Cookie("sid",user.getSessionId());
+        if (preparedStatement.getResultSet().getString("password").equals(user.getPassword())) {
+          cookie = new Cookie("sid", user.getSessionId());
           addUserAssociatedWithSession(user);
         }
       }
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    if (preparedStatement!=null){
+    if (preparedStatement != null) {
       try {
         preparedStatement.close();
       } catch (SQLException e) {
@@ -159,7 +160,7 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
   }
 
   @Override
-  public int getSessionsCount(){
+  public int getSessionsCount() {
     PreparedStatement preparedStatement = null;
 
     String sql = "select COUNT(DISTINCT userName) from sessions limit 1";
@@ -168,14 +169,14 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
       preparedStatement = connectionProvider.get().prepareStatement(sql);
       preparedStatement.execute();
 
-      while (preparedStatement.getResultSet().next()){
+      while (preparedStatement.getResultSet().next()) {
         return preparedStatement.getResultSet().getInt("COUNT(DISTINCT userName)");
       }
 
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    if (preparedStatement!=null){
+    if (preparedStatement != null) {
       try {
         preparedStatement.close();
       } catch (SQLException e) {
