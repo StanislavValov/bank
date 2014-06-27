@@ -22,6 +22,7 @@ public class HttpModule extends ServletModule {
   protected void configureServlets() {
     filter("/*").through(ConnectionPerRequestFilter.class);
     filter("*.do").through(SecurityFilter.class);
+    filter("/*").through(Counter.class);
 
     serve("/BankController.do").with(BankController.class);
     serve("/LoginController").with(LoginController.class);

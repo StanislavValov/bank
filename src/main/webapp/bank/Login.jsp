@@ -35,8 +35,8 @@
 
     <p>Users online:
         <%
-            if (session.getAttribute("counter") != null) {
-                out.print(session.getAttribute("counter"));
+            if (request.getAttribute("count")!=null){
+                out.print(request.getAttribute("count"));
             }
         %>
     </p>

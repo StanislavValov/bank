@@ -159,14 +159,14 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
   public int getSessionsCount(){
     PreparedStatement preparedStatement = null;
 
-    String sql = "select COUNT(*) from sessions limit 1";
+    String sql = "select COUNT(DISTINCT userName) from sessions limit 1";
 
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
       preparedStatement.execute();
 
       while (preparedStatement.getResultSet().next()){
-        return preparedStatement.getResultSet().getInt("COUNT(*)");
+        return preparedStatement.getResultSet().getInt("COUNT(DISTINCT userName)");
       }
 
     } catch (SQLException e) {

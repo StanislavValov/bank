@@ -1,27 +1,42 @@
 package com.clouway.bank.http;
 
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import java.io.IOException;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
+@Singleton
+public class Counter implements Filter {
 
-public class Counter implements HttpSessionListener {
+  SessionService sessionService;
 
-  private int activeSessions = 0;
-
-  @Override
-  public void sessionCreated(HttpSessionEvent httpSessionEvent) {
-    activeSessions++;
-    httpSessionEvent.getSession().setAttribute("counter",activeSessions);
+  @Inject
+  public Counter(SessionService sessionService) {
+    this.sessionService = sessionService;
   }
 
   @Override
-  public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
-    if (activeSessions > 0) {
-      activeSessions--;
-      httpSessionEvent.getSession().setAttribute("counter",activeSessions);
-    }
+  public void init(FilterConfig filterConfig) throws ServletException {
+
+  }
+
+  @Override
+  public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    servletRequest.setAttribute("count",sessionService.getSessionsCount());
+    filterChain.doFilter(servletRequest,servletResponse);
+  }
+
+  @Override
+  public void destroy() {
+
   }
 }
