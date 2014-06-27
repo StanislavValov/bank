@@ -39,7 +39,7 @@ public class RegistrationController extends HttpServlet {
 
     User user = new User(userName, password);
 
-    if (validator.isDataCorrect(user)) {
+    if (validator.isUserCorrect(user)) {
 
       if (!accountService.userExists(user)) {
         accountService.registerUser(user);
@@ -51,7 +51,7 @@ public class RegistrationController extends HttpServlet {
 
     } else {
       req.setAttribute(siteMap.errorLabel(), siteMap.validateErrorMessage());
-      req.getRequestDispatcher(siteMap.registrationJspLabel()).forward(req, resp);
     }
+    req.getRequestDispatcher(siteMap.registrationJspLabel()).forward(req, resp);
   }
 }

@@ -16,4 +16,6 @@ public interface SessionService {
   Timestamp getSessionExpirationTime(String sessionId);
 
   void resetSessionLife(String sessionId);
+
+  int getSessionsCount();
 }

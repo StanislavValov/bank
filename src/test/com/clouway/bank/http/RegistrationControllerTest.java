@@ -48,7 +48,7 @@ public class RegistrationControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(bankValidator).isDataCorrect(user);
+        oneOf(bankValidator).isUserCorrect(user);
         will(returnValue(true));
 
         oneOf(accountService).userExists(user);
@@ -75,7 +75,7 @@ public class RegistrationControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(bankValidator).isDataCorrect(user);
+        oneOf(bankValidator).isUserCorrect(user);
         will(returnValue(false));
 
         oneOf(request).setAttribute(siteMap.errorLabel(),siteMap.validateErrorMessage());
@@ -97,7 +97,7 @@ public class RegistrationControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(bankValidator).isDataCorrect(user);
+        oneOf(bankValidator).isUserCorrect(user);
         will(returnValue(true));
 
         oneOf(accountService).userExists(user);

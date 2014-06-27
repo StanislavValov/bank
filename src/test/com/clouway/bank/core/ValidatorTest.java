@@ -30,27 +30,27 @@ public class ValidatorTest {
 
   @Test
   public void dataIsCorrect() {
-    assertThat(validator.isDataCorrect(new User("Stanislav","123456")),is(true));
+    assertThat(validator.isUserCorrect(new User("Stanislav", "123456")),is(true));
   }
 
   @Test
   public void passwordIsShort() {
-    assertThat(validator.isDataCorrect(new User("Stanislav","1234")),is(false));
+    assertThat(validator.isUserCorrect(new User("Stanislav", "1234")),is(false));
   }
 
   @Test
   public void passwordIsLong() {
 
-    assertThat(validator.isDataCorrect(new User("Stanislav","1234567891234567890")),is(false));
+    assertThat(validator.isUserCorrect(new User("Stanislav", "1234567891234567890")),is(false));
   }
 
   @Test
   public void usernameIsShort() {
-    assertThat(validator.isDataCorrect(new User("Io","1111111")),is(false));
+    assertThat(validator.isUserCorrect(new User("Io", "1111111")),is(false));
   }
 
   @Test
   public void usernameIsLong() {
-    assertThat(validator.isDataCorrect(new User("abcdefghijklmnop","11111111")),is(false));
+    assertThat(validator.isUserCorrect(new User("abcdefghijklmnop", "11111111")),is(false));
   }
 }

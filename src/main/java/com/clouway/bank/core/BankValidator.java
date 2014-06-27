@@ -7,5 +7,5 @@ public interface BankValidator {
 
   boolean isAmountValid(String amount);
 
-  boolean isDataCorrect(User user);
+  boolean isUserCorrect(User user);
 }
