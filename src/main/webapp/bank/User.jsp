@@ -1,4 +1,4 @@
-<%@ page import="com.clouway.bank.core.User" %>
+<%@ page import="com.clouway.core.User" %>
 <%@ page import="java.text.DecimalFormat" %>
 <%--
   Created by IntelliJ IDEA.
@@ -20,11 +20,11 @@
 <Form method="get" action="/UserAccountController.do">
     <% DecimalFormat format = new DecimalFormat("#.##");%>
     <p>Amount:
-    <%
-        if (request.getAttribute("amount")!=null) {
-           out.print(format.format(request.getAttribute("amount")));
-       }
-    %> $</p>
+        <%
+            if (request.getAttribute("amount") != null) {
+                out.print(format.format(request.getAttribute("amount")));
+            }
+        %> $</p>
 </Form>
 
 <Form method="post" action="/BankController.do">

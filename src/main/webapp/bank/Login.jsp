@@ -1,5 +1,5 @@
-<%@ page import="com.clouway.bank.http.SessionService" %>
-<%@ page import="com.clouway.bank.persistence.PersistentSessionService" %>
+<%@ page import="com.clouway.http.SessionService" %>
+<%@ page import="com.clouway.persistence.PersistentSessionService" %>
 <%--
   Created by IntelliJ IDEA.
   User: clouway
@@ -8,7 +8,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%--<%@ page import="com.clouway.bank.http.Counter" %>--%>
+<%--<%@ page import="java.com.clouway.http.Counter" %>--%>
 
 <html>
 <head>
@@ -35,7 +35,7 @@
 
     <p>Users online:
         <%
-            if (request.getAttribute("count")!=null){
+            if (request.getAttribute("count") != null) {
                 out.print(request.getAttribute("count"));
             }
         %>

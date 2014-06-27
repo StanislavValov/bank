@@ -21,7 +21,7 @@
   </filter-mapping>
 
   <listener>
-    <listener-class>com.clouway.bank.http.ApplicationBootstrap</listener-class>
+    <listener-class>com.clouway.http.ApplicationBootstrap</listener-class>
   </listener>
 
 </web-app>
