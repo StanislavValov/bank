@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -77,15 +79,16 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
   }
 
   @Override
-  public Timestamp getSessionExpirationTime(String sessionId) {
+  public Map<String,Timestamp> getSessionsExpirationTime() {
     PreparedStatement preparedStatement = null;
-    String sql = "SELECT expirationDate from sessions where sessionId=?";
+    String sql = "SELECT sessionId,expirationDate from sessions";
+    Map<String,Timestamp>expTime = new HashMap<String, Timestamp>();
     try {
       preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1, sessionId);
       preparedStatement.execute();
       while (preparedStatement.getResultSet().next()) {
-        return preparedStatement.getResultSet().getTimestamp("expirationDate");
+         expTime.put(preparedStatement.getResultSet().getString("sessionId"),
+                 preparedStatement.getResultSet().getTimestamp("expirationDate"));
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -97,7 +100,7 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
         e.printStackTrace();
       }
     }
-    return null;
+    return expTime;
   }
 
   @Override
@@ -171,6 +174,13 @@ public class PersistentSessionService implements SessionService,AuthorisationSer
 
     } catch (SQLException e) {
       e.printStackTrace();
+    }
+    if (preparedStatement!=null){
+      try {
+        preparedStatement.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
     }
     return 0;
   }

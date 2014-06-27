@@ -70,7 +70,7 @@ public class SecurityFilterTest {
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-        oneOf(sessionService).getSessionExpirationTime(user.getSessionId());
+//        oneOf(sessionService).getSessionsExpirationTime(user.getSessionId());
         will(returnValue(expirationTIme));
 
         oneOf(clockUtil).currentTime();
@@ -92,7 +92,7 @@ public class SecurityFilterTest {
         oneOf(provider).get();
         will(returnValue(currentUser));
 
-        oneOf(sessionService).getSessionExpirationTime(user.getSessionId());
+//        oneOf(sessionService).getSessionsExpirationTime(user.getSessionId());
         will(returnValue(expirationTIme));
 
         oneOf(clockUtil).currentTime();

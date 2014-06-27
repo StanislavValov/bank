@@ -3,7 +3,6 @@ package com.clouway.bank.http;
 import com.clouway.bank.core.ClockUtil;
 import com.clouway.bank.core.CurrentUser;
 import com.clouway.bank.core.SiteMap;
-import com.clouway.bank.core.User;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -14,9 +13,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Map;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -45,24 +44,17 @@ public class SecurityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-    HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+    Map<String, Timestamp> expirationTime = sessionService.getSessionsExpirationTime();
 
-    User user = currentUserProvider.get().getUser();
-
-    if (user != null) {
-      Timestamp expirationTime = sessionService.getSessionExpirationTime(user.getSessionId());
-
-      if (expirationTime.before(clockUtil.currentTime())) {
-
-        servletRequest.getRequestDispatcher(siteMap.logoutController()).forward(servletRequest, httpResponse);
+    for (String session : expirationTime.keySet()) {
+      if (expirationTime.get(session).before(clockUtil.currentTime())) {
+        sessionService.removeSessionId(session);
 
       } else {
-
-        sessionService.resetSessionLife(user.getSessionId());
-        filterChain.doFilter(servletRequest, servletResponse);
+        sessionService.resetSessionLife(session);
       }
-    } else {
-      httpResponse.sendRedirect(siteMap.loginJspLabel());
+
+      filterChain.doFilter(servletRequest, servletResponse);
     }
   }
 
