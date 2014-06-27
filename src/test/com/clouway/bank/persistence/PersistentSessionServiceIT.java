@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -75,6 +76,12 @@ public class PersistentSessionServiceIT {
 
   @Test
   public void removeSessionIdSuccessful() {
+    sessionService.removeSessionId(user.getSessionId());
+    assertNull(sessionService.findUserAssociatedWithSession(user.getSessionId()));
+  }
 
+  @Test
+  public void getSessionsCount() {
+    assertThat(sessionService.getSessionsCount(),is(1));
   }
 }
