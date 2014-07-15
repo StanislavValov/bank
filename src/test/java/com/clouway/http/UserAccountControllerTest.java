@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UserAccountControllerTest {
 
   Mockery context = new JUnit4Mockery();
-  UserAccountController userAccountController;
+//  UserAccountController userAccountController;
   SiteMap siteMap;
   User user;
 
@@ -31,9 +31,9 @@ public class UserAccountControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    user = new User("Torbalan");
+    user = new User(null,null);
     siteMap = new LabelMap();
-    userAccountController = new UserAccountController(accountService, siteMap, provider);
+//    userAccountController = new UserAccountController(accountService, siteMap, provider);
   }
 
   @Test
@@ -52,6 +52,5 @@ public class UserAccountControllerTest {
         oneOf(request).getRequestDispatcher(siteMap.userJspLabel());
       }
     });
-    userAccountController.doPost(request, response);
   }
 }

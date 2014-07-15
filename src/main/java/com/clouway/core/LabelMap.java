@@ -37,7 +37,7 @@ public class LabelMap implements SiteMap {
 
   @Override
   public String loginJspLabel() {
-    return "/bank/Login.jsp";
+    return "/bank/Login.html";
   }
 
   @Override
@@ -57,7 +57,7 @@ public class LabelMap implements SiteMap {
 
   @Override
   public String successfulTransactionLabel() {
-    return "/bank/SuccessfulTransaction.jsp";
+    return "/bank/SuccessfulTransaction.html";
   }
 
   @Override
@@ -72,12 +72,12 @@ public class LabelMap implements SiteMap {
 
   @Override
   public String transactionErrorLabel() {
-    return "/bank/TransactionError.jsp";
+    return "/bank/TransactionError.html";
   }
 
   @Override
   public String userJspLabel() {
-    return "/bank/User.jsp";
+    return "/bank/User.html";
   }
 
   @Override
@@ -92,7 +92,7 @@ public class LabelMap implements SiteMap {
 
   @Override
   public String registrationJspLabel() {
-    return "/bank/RegistrationForm.jsp";
+    return "/bank/RegistrationForm.html";
   }
 
   @Override

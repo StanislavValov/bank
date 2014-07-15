@@ -1,9 +1,7 @@
 package com.clouway.http;
 
-import com.clouway.core.ClockUtil;
-import com.clouway.core.CurrentUser;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
+import com.clouway.core.SessionService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -56,7 +54,7 @@ public class SecurityFilter implements Filter {
 
       if (sessionsExpirationTime.get(user.getSessionId()).before(currentTime)) {
 
-        servletRequest.getRequestDispatcher(siteMap.logoutController()).forward(servletRequest, response);
+        response.sendRedirect(siteMap.logoutController());
 
       } else {
         sessionService.resetSessionLife(user.getSessionId());
@@ -69,7 +67,7 @@ public class SecurityFilter implements Filter {
 
     for (String sessionId : sessionsExpirationTime.keySet()) {
       if (sessionsExpirationTime.get(sessionId).before(currentTime)) {
-        sessionService.removeSessionId(sessionId);
+        sessionService.removeSession(sessionId);
       }
     }
   }

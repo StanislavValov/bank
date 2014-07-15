@@ -6,8 +6,8 @@ package com.clouway.core;
 public class Validator implements BankValidator {
 
   @Override
-  public boolean isAmountValid(String amount) {
-    return amount.matches("^[1-9][0-9]*(\\.[0-9]{1,2})?$");
+  public boolean isAmountValid(double amount) {
+    return String.valueOf(amount).matches("^[1-9][0-9]*(\\.[0-9]{1,2})?$");
   }
 
   @Override

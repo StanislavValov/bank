@@ -21,14 +21,14 @@ public class PersistentBankServiceIT {
   PersistentBankService bankService;
   PersistentSessionService sessionService;
   User user;
-  String amount;
+  double amount;
   MysqlConnectionPoolDataSource dataSource;
   Connection connection;
 
   @Before
   public void setUp() throws Exception {
-    amount = "5.00";
-    user = new User("Torbalan", "unknown", "123");
+    amount = 5.00;
+    user = new User(null,null);
     dataSource = new MysqlConnectionPoolDataSource();
 
     dataSource.setUser("root");

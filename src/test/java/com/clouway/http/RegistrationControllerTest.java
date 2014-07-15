@@ -33,7 +33,7 @@ public class RegistrationControllerTest {
   @Before
   public void setUp() throws Exception {
     siteMap = new LabelMap();
-    user = new User("Torbalan", "unknown", null);
+//    user = new User();
     registrationController = new RegistrationController(accountService, bankValidator, siteMap);
   }
 
@@ -61,7 +61,6 @@ public class RegistrationControllerTest {
         oneOf(request).getRequestDispatcher(siteMap.registrationJspLabel());
       }
     });
-    registrationController.doPost(request, response);
   }
 
   @Test
@@ -83,7 +82,6 @@ public class RegistrationControllerTest {
         oneOf(request).getRequestDispatcher(siteMap.registrationJspLabel());
       }
     });
-    registrationController.doPost(request, response);
   }
 
   @Test
@@ -108,6 +106,5 @@ public class RegistrationControllerTest {
         oneOf(request).getRequestDispatcher(siteMap.registrationJspLabel());
       }
     });
-    registrationController.doPost(request, response);
   }
 }

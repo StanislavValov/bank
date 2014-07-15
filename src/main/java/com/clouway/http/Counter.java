@@ -1,5 +1,6 @@
 package com.clouway.http;
 
+import com.clouway.core.SessionService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

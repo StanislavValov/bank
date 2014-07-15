@@ -1,0 +1,21 @@
+<html>
+<head>
+    <title></title>
+</head>
+<body bgcolor="#b0c4de">
+
+
+<Form method="post" action="/bankController">
+    Amount: ${this.getUserAccountAmount()}
+    <br>
+    <input type="text" name="account.transactionAmount"><br/>
+    <input type="submit" name="account.deposit" value="deposit">
+    <input type="submit" name="account.withdraw" value="withdraw">
+</Form>
+
+<form method="post" action="/logout">
+    <input type="submit" name="logout" value="Logout">
+</form>
+
+</body>
+</html>

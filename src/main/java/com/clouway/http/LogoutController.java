@@ -1,51 +1,49 @@
 package com.clouway.http;
 
-import com.clouway.core.CurrentUser;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
+import com.clouway.core.SessionService;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.sitebricks.At;
+import com.google.sitebricks.Show;
+import com.google.sitebricks.http.Post;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
+@At("/logout")
+@Show("/bank/Login.html")
 @Singleton
-public class LogoutController extends HttpServlet {
+public class LogoutController {
 
-  private Provider<CurrentUser> currentUserProvider;
-  private SessionService sessionService;
-  private SiteMap siteMap;
+    private Provider<CurrentUser> currentUserProvider;
+    private SessionService sessionService;
 
-  @Inject
-  public LogoutController(Provider<CurrentUser> currentUserProvider, SessionService sessionService, SiteMap siteMap) {
-    this.currentUserProvider = currentUserProvider;
-    this.sessionService = sessionService;
-    this.siteMap = siteMap;
-  }
-
-  @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-    Cookie[] cookies = req.getCookies();
-
-    for (Cookie cookie : cookies) {
-
-      User currentUser = currentUserProvider.get().getUser();
-
-      if (currentUser.getSessionId().equalsIgnoreCase(cookie.getValue())) {
-        cookie.setMaxAge(0);
-        sessionService.removeSessionId(currentUser.getSessionId());
-        resp.addCookie(cookie);
-      }
+    @Inject
+    public LogoutController(Provider<CurrentUser> currentUserProvider, SessionService sessionService) {
+        this.currentUserProvider = currentUserProvider;
+        this.sessionService = sessionService;
     }
-    resp.sendRedirect(siteMap.loginJspLabel());
-  }
+
+    @Post
+    public void logout(HttpServletRequest req, HttpServletResponse resp) {
+
+        Cookie[] cookies = req.getCookies();
+
+        for (Cookie cookie : cookies) {
+
+            User currentUser = currentUserProvider.get().getUser();
+
+            if (currentUser.getSessionId().equalsIgnoreCase(cookie.getValue())) {
+                cookie.setMaxAge(0);
+                sessionService.removeSession(currentUser.getSessionId());
+                resp.addCookie(cookie);
+            }
+        }
+    }
 }

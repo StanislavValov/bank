@@ -1,6 +1,7 @@
 package com.clouway.http;
 
 import com.clouway.core.*;
+import com.clouway.core.SessionService;
 import com.clouway.core.ConnectionPerRequestFilter;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -19,14 +20,8 @@ public class HttpModule extends ServletModule {
   @Override
   protected void configureServlets() {
     filter("/*").through(ConnectionPerRequestFilter.class);
-    filter("*.do").through(SecurityFilter.class);
+    filterRegex("/(.)*Controller(.)*").through(SecurityFilter.class);
     filter("/*").through(Counter.class);
-
-    serve("/BankController.do").with(BankController.class);
-    serve("/LoginController").with(LoginController.class);
-    serve("/Registration").with(RegistrationController.class);
-    serve("/UserAccountController.do").with(UserAccountController.class);
-    serve("/LogoutController.do").with(LogoutController.class);
 
     bind(BankValidator.class).to(Validator.class);
     bind(SiteMap.class).to(LabelMap.class);

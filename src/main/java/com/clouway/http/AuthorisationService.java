@@ -9,5 +9,5 @@ import javax.servlet.http.Cookie;
  */
 public interface AuthorisationService {
 
-  Cookie authenticate(User user);
+  boolean isUserAuthorised(User user);
 }

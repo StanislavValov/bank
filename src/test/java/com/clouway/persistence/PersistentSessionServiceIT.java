@@ -28,7 +28,7 @@ public class PersistentSessionServiceIT {
 
   @Before
   public void setUp() throws Exception {
-    user = new User("Thor", "unknown", "someId");
+//    user = new User();
     dataSource = new MysqlConnectionPoolDataSource();
 
     dataSource.setUser("root");
@@ -55,7 +55,7 @@ public class PersistentSessionServiceIT {
     sessionService.cleanSessionsTable();
     accountService.cleanAccountsTable();
     accountService.registerUser(user);
-    sessionService.authenticate(user);
+    sessionService.isUserAuthorised(user);
   }
 
   @Test
@@ -76,7 +76,7 @@ public class PersistentSessionServiceIT {
 
   @Test
   public void removeSessionIdSuccessful() {
-    sessionService.removeSessionId(user.getSessionId());
+    sessionService.removeSession(user.getSessionId());
     assertNull(sessionService.findUserAssociatedWithSession(user.getSessionId()));
   }
 

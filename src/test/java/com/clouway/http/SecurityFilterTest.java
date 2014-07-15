@@ -1,10 +1,7 @@
 package com.clouway.http;
 
-import com.clouway.core.ClockUtil;
-import com.clouway.core.CurrentUser;
-import com.clouway.core.LabelMap;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
+import com.clouway.core.SessionService;
 import com.google.inject.Provider;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -41,7 +38,7 @@ public class SecurityFilterTest {
   @Before
   public void setUp() throws Exception {
     sessionsExpirationTime = new HashMap<String, Timestamp>();
-    user = new User("Torbalan", "unknown", "111");
+//    user = new User();
     currentUser = new CurrentUser(user);
     siteMap = new LabelMap();
     securityFilter = new SecurityFilter(provider, sessionService, siteMap, clockUtil);
@@ -79,7 +76,7 @@ public class SecurityFilterTest {
         oneOf(clockUtil).currentTime();
         will(returnValue(currentTime));
 
-        oneOf(sessionService).removeSessionId(user.getSessionId());
+        oneOf(sessionService).removeSession(user.getSessionId());
 
         oneOf(request).getRequestDispatcher(siteMap.logoutController());
       }
@@ -133,7 +130,7 @@ public class SecurityFilterTest {
 
         oneOf(request).getRequestDispatcher(siteMap.logoutController());
 
-        oneOf(sessionService).removeSessionId(user.getSessionId());
+        oneOf(sessionService).removeSession(user.getSessionId());
       }
     });
     securityFilter.doFilter(request, response, filterChain);

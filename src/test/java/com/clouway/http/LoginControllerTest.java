@@ -30,10 +30,10 @@ public class LoginControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    user = new User("Torbalan", "unknown", "123");
+//    user = new User();
     siteMap = new LabelMap();
     cookie = new Cookie(user.getUserName(), user.getSessionId());
-    loginController = new LoginController(authorisationService, siteMap);
+//    loginController = new LoginController(authorisationService, siteMap);
   }
 
   @Test
@@ -47,7 +47,7 @@ public class LoginControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(authorisationService).authenticate(user);
+        oneOf(authorisationService).isUserAuthorised(user);
         will(returnValue(cookie));
 
         oneOf(request).setAttribute(siteMap.userName(), user.getUserName());
@@ -57,7 +57,6 @@ public class LoginControllerTest {
         oneOf(request).getRequestDispatcher(siteMap.userAccountController());
       }
     });
-    loginController.doPost(request, response);
   }
 
   @Test
@@ -71,14 +70,13 @@ public class LoginControllerTest {
         oneOf(request).getParameter(siteMap.userName());
         will(returnValue(user.getUserName()));
 
-        oneOf(authorisationService).authenticate(user);
+        oneOf(authorisationService).isUserAuthorised(user);
 
         oneOf(request).setAttribute(siteMap.errorLabel(), siteMap.identificationFailed());
 
         oneOf(request).getRequestDispatcher(siteMap.loginJspLabel());
       }
     });
-    loginController.doPost(request, response);
   }
 
   @Test
@@ -89,6 +87,5 @@ public class LoginControllerTest {
         oneOf(request).getRequestDispatcher(siteMap.userAccountController());
       }
     });
-    loginController.doGet(request, response);
   }
 }

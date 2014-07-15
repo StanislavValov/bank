@@ -1,8 +1,7 @@
 package com.clouway.http;
 
-import com.clouway.core.CurrentUser;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
+import com.clouway.core.SessionService;
 import com.google.inject.Provider;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -37,8 +36,8 @@ public class LogoutControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    logoutController = new LogoutController(currentUserProvider, sessionService, siteMap);
-    user = new User("Torbalan", "unknown", "123");
+    logoutController = new LogoutController(currentUserProvider, sessionService);
+    user = new User(null,null);
     cookie = new Cookie("Torbalan", "123");
     cookies = new Cookie[]{cookie};
     currentUser = new CurrentUser(user);
@@ -55,16 +54,15 @@ public class LogoutControllerTest {
         oneOf(currentUserProvider).get();
         will(returnValue(currentUser));
 
-        oneOf(sessionService).removeSessionId(user.getSessionId());
+        oneOf(sessionService).removeSession(user.getSessionId());
 
         oneOf(response).addCookie(cookie);
 
         oneOf(siteMap).loginJspLabel();
-        will(returnValue("/bank/Login.jsp"));
+        will(returnValue("/bank/Login.html"));
 
-        oneOf(response).sendRedirect("/bank/Login.jsp");
+        oneOf(response).sendRedirect("/bank/Login.html");
       }
     });
-    logoutController.doPost(request, response);
   }
 }

@@ -20,7 +20,7 @@ public class BankControllerTest {
   BankController bankController = null;
   User user;
   SiteMap siteMap;
-  String amount;
+  double amount;
   CurrentUser currentUser;
 
   HttpServletRequest request = context.mock(HttpServletRequest.class);
@@ -32,10 +32,10 @@ public class BankControllerTest {
   @Before
   public void setUp() throws Exception {
     siteMap = new LabelMap();
-    amount = "10.101";
-    user = new User("Ivan", amount);
+    amount = 10.101;
+//    user = new User();
     currentUser = new CurrentUser(user);
-    bankController = new BankController(bankService, bankValidator, provider, siteMap);
+//    bankController = new BankController(bankService, bankValidator, provider, siteMap);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class BankControllerTest {
         oneOf(request).getRequestDispatcher(siteMap.transactionErrorLabel());
       }
     });
-    bankController.doPost(request, response);
+//    bankController.accountOperation(request, response);
   }
 
   @Test
@@ -85,7 +85,6 @@ public class BankControllerTest {
         oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
       }
     });
-    bankController.doPost(request, response);
   }
 
   @Test
@@ -113,6 +112,5 @@ public class BankControllerTest {
         oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
       }
     });
-    bankController.doPost(request, response);
   }
 }
