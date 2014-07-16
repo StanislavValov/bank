@@ -1,10 +1,6 @@
 package com.clouway.http;
 
-import com.clouway.core.SessionService;
-import com.clouway.core.User;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
+import com.clouway.core.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;
@@ -24,28 +20,30 @@ public class LoginController {
 
     private AuthorisationService authorisationService;
     private SessionService sessionService;
+    private SiteMap siteMap;
+    private Generator generator;
     private User user = new User();
 
     @Inject
-    public LoginController(AuthorisationService authorisationService, SessionService sessionService) {
+    public LoginController(AuthorisationService authorisationService, SessionService sessionService, SiteMap siteMap, Generator generator) {
         this.authorisationService = authorisationService;
         this.sessionService = sessionService;
+        this.siteMap = siteMap;
+        this.generator = generator;
     }
 
     @Post
-    public String authorisation(HttpServletResponse response) {
+    public String authorise(HttpServletResponse response) {
+
+        String sessionId = generator.getUniqueId(user);
 
         if (!authorisationService.isUserAuthorised(user)) {
             return null;
-
-        } else {
-            HashFunction hf = Hashing.sha1();
-            HashCode hashCode = hf.hashString(user.getUserName() + user.getPassword() + System.currentTimeMillis());
-            String sessionId = hashCode.toString();
-            response.addCookie(new Cookie("sid", sessionId));
-            sessionService.addUserAssociatedWithSession(user);
-            return "/bankController";
         }
+
+        response.addCookie(new Cookie(siteMap.cookieName(), sessionId));
+        sessionService.addUserAssociatedWithSession(user, sessionId);
+        return siteMap.bankController();
     }
 
     public User getUser() {

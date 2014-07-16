@@ -11,46 +11,60 @@ import static org.junit.Assert.assertThat;
  */
 public class ValidatorTest {
 
-  Validator validator;
+    Validator validator;
 
-  @Before
-  public void setUp() throws Exception {
-    validator = new Validator();
-  }
+    @Before
+    public void setUp() throws Exception {
+        validator = new Validator();
+    }
 
-  @Test
-  public void correctAmount() {
-    assertThat(validator.isAmountValid(5.12), is(true));
-  }
+    @Test
+    public void correctAmount() {
+        assertThat(validator.isAmountValid(5.12), is(true));
+    }
 
-  @Test
-  public void incorrectAmount() {
-    assertThat(validator.isAmountValid(5.555), is(false));
-  }
+    @Test
+    public void incorrectAmount() {
+        assertThat(validator.isAmountValid(5.555), is(false));
+    }
 
-  @Test
-  public void dataIsCorrect() {
-//    assertThat(validator.isUserCorrect(new User(null,null)), is(true));
-  }
+    @Test
+    public void dataIsCorrect() {
+        User user = new User();
+        user.setUserName("Stanislav");
+        user.setPassword("123456");
+        assertThat(validator.isUserCorrect(user), is(true));
+    }
 
-  @Test
-  public void passwordIsShort() {
-//    assertThat(validator.isUserCorrect(new User()), is(false));
-  }
+    @Test
+    public void passwordIsShort() {
+        User user = new User();
+        user.setUserName("Stanislav");
+        user.setPassword("112");
+        assertThat(validator.isUserCorrect(user), is(false));
+    }
 
-  @Test
-  public void passwordIsLong() {
+    @Test
+    public void passwordIsLong() {
+        User user = new User();
+        user.setUserName("Stanislav");
+        user.setPassword("12345678912323123123");
+        assertThat(validator.isUserCorrect(user), is(false));
+    }
 
-//    assertThat(validator.isUserCorrect(new User()), is(false));
-  }
+    @Test
+    public void usernameIsShort() {
+        User user = new User();
+        user.setUserName("S");
+        user.setPassword("123456");
+        assertThat(validator.isUserCorrect(user), is(false));
+    }
 
-  @Test
-  public void usernameIsShort() {
-//    assertThat(validator.isUserCorrect(new User()), is(false));
-  }
-
-  @Test
-  public void usernameIsLong() {
-//    assertThat(validator.isUserCorrect(new User()), is(false));
-  }
+    @Test
+    public void usernameIsLong() {
+        User user = new User();
+        user.setUserName("StanislavValentinovValov");
+        user.setPassword("123456");
+        assertThat(validator.isUserCorrect(user), is(false));
+    }
 }

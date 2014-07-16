@@ -1,8 +1,7 @@
 package com.clouway.http;
 
-import com.clouway.core.LabelMap;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
+import com.clouway.persistence.FakeHttpServletResponse;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
@@ -10,82 +9,73 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 public class LoginControllerTest {
 
-  LoginController loginController;
-  Mockery context = new JUnit4Mockery();
-  User user;
-  SiteMap siteMap;
-  Cookie cookie;
+    Mockery context = new JUnit4Mockery();
+    LoginController loginController;
+    User user;
+    Cookie cookie;
+    FakeHttpServletResponse response;
 
-  HttpServletRequest request = context.mock(HttpServletRequest.class);
-  HttpServletResponse response = context.mock(HttpServletResponse.class);
-  AuthorisationService authorisationService = context.mock(AuthorisationService.class);
+    AuthorisationService authorisationService = context.mock(AuthorisationService.class);
+    SessionService sessionService = context.mock(SessionService.class);
+    SiteMap siteMap = context.mock(SiteMap.class);
+    Generator idGenerator = context.mock(Generator.class);
 
-  @Before
-  public void setUp() throws Exception {
-//    user = new User();
-    siteMap = new LabelMap();
-    cookie = new Cookie(user.getUserName(), user.getSessionId());
-//    loginController = new LoginController(authorisationService, siteMap);
-  }
+    @Before
+    public void setUp() throws Exception {
+        user = new User();
+        siteMap = new LabelMap();
+        cookie = new Cookie("sid", "someId");
+        loginController = new LoginController(authorisationService, sessionService, siteMap, idGenerator);
+        loginController.setUser(user);
+        response = new FakeHttpServletResponse() {
+            @Override
+            public void addCookie(Cookie cookie) {
+                super.addCookie(cookie);
+            }
+        };
+    }
 
-  @Test
-  public void loginSuccess() throws Exception {
+    @Test
+    public void loginSuccessFul()  {
 
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.password());
-        will(returnValue(user.getPassword()));
+        user.setUserName("Torbalan");
 
-        oneOf(request).getParameter(siteMap.userName());
-        will(returnValue(user.getUserName()));
+        context.checking(new Expectations() {
+            {
+                oneOf(authorisationService).isUserAuthorised(user);
+                will(returnValue(true));
 
-        oneOf(authorisationService).isUserAuthorised(user);
-        will(returnValue(cookie));
+                oneOf(idGenerator).getUniqueId(user);
+                will(returnValue("123"));
 
-        oneOf(request).setAttribute(siteMap.userName(), user.getUserName());
+                oneOf(sessionService).addUserAssociatedWithSession(user, "123");
+            }
+        });
+        assertThat(loginController.authorise(response), is("/bankController"));
+    }
 
-        oneOf(response).addCookie(cookie);
+    @Test
+    public void loginFailed()  {
 
-        oneOf(request).getRequestDispatcher(siteMap.userAccountController());
-      }
-    });
-  }
+        context.checking(new Expectations() {
+            {
+                oneOf(authorisationService).isUserAuthorised(user);
+                will(returnValue(false));
 
-  @Test
-  public void loginFailed() throws Exception {
-
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.password());
-        will(returnValue(user.getPassword()));
-
-        oneOf(request).getParameter(siteMap.userName());
-        will(returnValue(user.getUserName()));
-
-        oneOf(authorisationService).isUserAuthorised(user);
-
-        oneOf(request).setAttribute(siteMap.errorLabel(), siteMap.identificationFailed());
-
-        oneOf(request).getRequestDispatcher(siteMap.loginJspLabel());
-      }
-    });
-  }
-
-  @Test
-  public void successfulRedirect() throws Exception {
-
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getRequestDispatcher(siteMap.userAccountController());
-      }
-    });
-  }
+                oneOf(idGenerator).getUniqueId(user);
+                will(returnValue("123"));
+            }
+        });
+        assertNull(loginController.authorise(response));
+    }
 }

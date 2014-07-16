@@ -1,6 +1,6 @@
 package com.clouway.core;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 public interface ClockUtil {
 
-  Timestamp currentTime();
+    Date currentTime();
 
-  Timestamp expirationDate();
+    Date expirationDate();
 }

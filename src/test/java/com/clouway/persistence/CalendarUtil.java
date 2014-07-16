@@ -9,15 +9,13 @@ import java.util.Date;
  */
 public class CalendarUtil {
 
-  public static Timestamp june(int year, int day) {
+  public static Date june(int year, int day) {
     Calendar calendar = Calendar.getInstance();
 
     calendar.set(Calendar.YEAR, year);
     calendar.set(Calendar.DAY_OF_MONTH, day);
     calendar.set(Calendar.MILLISECOND, 0);
     calendar.set(Calendar.SECOND, 0);
-    Date date = calendar.getTime();
-
-    return new Timestamp(date.getTime());
+    return calendar.getTime();
   }
 }

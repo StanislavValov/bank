@@ -1,6 +1,5 @@
 package com.clouway.http;
 
-import com.clouway.core.Blogs;
 import com.clouway.persistence.PersistentModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -18,7 +17,6 @@ public class ApplicationBootstrap extends GuiceServletContextListener {
             @Override
             protected void configureSitebricks() {
                 scan(LoginController.class.getPackage());
-                scan(Blogs.class.getPackage());
                 scan(BankController.class.getPackage());
                 scan(LogoutController.class.getPackage());
             }

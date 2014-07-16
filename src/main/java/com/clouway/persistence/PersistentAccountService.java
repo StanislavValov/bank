@@ -2,120 +2,110 @@ package com.clouway.persistence;
 
 import com.clouway.core.AccountService;
 import com.clouway.core.User;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
+import com.clouway.http.AuthorisationService;
+import com.mongodb.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.net.UnknownHostException;
 
 /**
- * Created by Stanislav Valov <hisazzul@gmail.com>
+ * Created by hisazzul@gmail.com on 7/14/14.
  */
-@Singleton
-public class PersistentAccountService implements AccountService {
+public class PersistentAccountService implements AccountService, AuthorisationService {
 
-  private final Provider<Connection> connectionProvider;
+    private MongoClient mongoClient;
+    private DBCollection accounts;
+    private DB database;
 
-  @Inject
-  public PersistentAccountService(Provider<Connection> connectionProvider) {
-    this.connectionProvider = connectionProvider;
-  }
 
-  @Override
-  public void registerUser(User user) {
-    PreparedStatement preparedStatement = null;
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement("Insert into accounts values(?,?,?)");
-      preparedStatement.setString(1, user.getUserName());
-      preparedStatement.setString(2, user.getPassword());
-      preparedStatement.setDouble(3, 0);
-      preparedStatement.execute();
+    @Override
+    public boolean userExists(User user) {
 
-      preparedStatement.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (preparedStatement != null) {
         try {
-          preparedStatement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-  }
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            accounts = database.getCollection("accounts");
 
-  @Override
-  public double getAccountAmount(User user) {
-    PreparedStatement preparedStatement = null;
-    String sql = "select amount from accounts where userName=?";
-    double result = 0.0;
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.setString(1, user.getUserName());
-      preparedStatement.execute();
-      while (preparedStatement.getResultSet().next()) {
-        result = preparedStatement.getResultSet().getDouble("amount");
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (preparedStatement != null) {
+            BasicDBObject query = new BasicDBObject();
+            query.append("userName", user.getUserName());
+
+            BasicDBObject field = new BasicDBObject();
+            field.put("userName", user.getUserName());
+
+            DBCursor cursor = accounts.find(query, field);
+            while (cursor.hasNext()) {
+                return true;
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public void registerUser(User user) {
+
         try {
-          preparedStatement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-    return result;
-  }
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            database.requestStart();
+            accounts = database.getCollection("accounts");
 
-  @Override
-  public boolean userExists(User user) {
-    PreparedStatement preparedStatement = null;
-    boolean exists = false;
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement("SELECT userName from accounts where userName=?");
-      preparedStatement.setString(1, user.getUserName());
-      preparedStatement.execute();
-      while (preparedStatement.getResultSet().next()) {
-        exists = true;
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (preparedStatement != null) {
+            BasicDBObject doc = new BasicDBObject()
+                    .append("userName", user.getUserName())
+                    .append("password", user.getPassword())
+                    .append("amount", 0);
+            accounts.insert(doc);
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isUserAuthorised(User user) {
+
         try {
-          preparedStatement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            accounts = database.getCollection("accounts");
+
+            BasicDBObject query = new BasicDBObject();
+            query.append("userName", user.getUserName());
+
+            BasicDBObject fields = new BasicDBObject();
+
+            fields.put("userName", 1);
+            fields.put("password", 2);
+
+            DBCursor cursor = accounts.find(query, fields);
+
+            while (cursor.hasNext()) {
+                BasicDBObject dbObject = (BasicDBObject) cursor.next();
+
+                if (dbObject.get("password").equals(user.getPassword())){
+                    return true;
+                }
+            }
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
-      }
+        return false;
     }
-    return exists;
-  }
 
-  public void cleanAccountsTable() {
-    PreparedStatement preparedStatement = null;
-    String sql = "delete from accounts";
-
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement(sql);
-      preparedStatement.execute();
-
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (preparedStatement != null) {
+    @Override
+    public void deleteUser(User user){
         try {
-          preparedStatement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            accounts = database.getCollection("accounts");
+
+            BasicDBObject query = new BasicDBObject("userName", user.getUserName());
+
+            accounts.remove(query);
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
-      }
     }
-  }
 }

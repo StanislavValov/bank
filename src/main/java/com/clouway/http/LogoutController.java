@@ -23,15 +23,17 @@ public class LogoutController {
 
     private Provider<CurrentUser> currentUserProvider;
     private SessionService sessionService;
+    private SiteMap siteMap;
 
     @Inject
-    public LogoutController(Provider<CurrentUser> currentUserProvider, SessionService sessionService) {
+    public LogoutController(Provider<CurrentUser> currentUserProvider, SessionService sessionService, SiteMap siteMap) {
         this.currentUserProvider = currentUserProvider;
         this.sessionService = sessionService;
+        this.siteMap = siteMap;
     }
 
     @Post
-    public void logout(HttpServletRequest req, HttpServletResponse resp) {
+    public String logout(HttpServletRequest req, HttpServletResponse resp) {
 
         Cookie[] cookies = req.getCookies();
 
@@ -45,5 +47,6 @@ public class LogoutController {
                 resp.addCookie(cookie);
             }
         }
+        return siteMap.loginForm();
     }
 }

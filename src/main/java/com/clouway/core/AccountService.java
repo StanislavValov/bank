@@ -5,9 +5,9 @@ package com.clouway.core;
  */
 public interface AccountService {
 
-  double getAccountAmount(User user);
+    boolean userExists(User user);
 
-  boolean userExists(User user);
+    void registerUser(User user);
 
-  void registerUser(User user);
+    void deleteUser(User user);
 }

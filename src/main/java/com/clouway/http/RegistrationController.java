@@ -10,12 +10,6 @@ import com.google.sitebricks.At;
 import com.google.sitebricks.Show;
 import com.google.sitebricks.http.Post;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
@@ -36,7 +30,6 @@ public class RegistrationController {
         this.siteMap = siteMap;
     }
 
-
     @Post
     public String register() {
 
@@ -44,16 +37,10 @@ public class RegistrationController {
 
             if (!accountService.userExists(user)) {
                 accountService.registerUser(user);
-                return "/bank/Login.html";
-
-            } else {
-//                req.setAttribute(siteMap.errorLabel(), siteMap.userExistErrorLabel());
+                return siteMap.loginForm();
             }
-
-        } else {
-//            req.setAttribute(siteMap.errorLabel(), siteMap.validateErrorMessage());
         }
-        return "/registration";
+        return siteMap.registrationForm();
     }
 
     public User getUser() {
@@ -64,3 +51,4 @@ public class RegistrationController {
         this.user = user;
     }
 }
+

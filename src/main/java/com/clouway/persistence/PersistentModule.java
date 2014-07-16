@@ -13,9 +13,9 @@ public class PersistentModule extends ServletModule {
 
   @Override
   protected void configureServlets() {
-    bind(BankService.class).to(MongoDbBankService.class);
-    bind(AccountService.class).to(MongoDbAccountService.class);
-    bind(SessionService.class).to(MongoDbSessionService.class);
-    bind(AuthorisationService.class).to(MongoDbAccountService.class);
+    bind(BankService.class).to(PersistentBankService.class);
+    bind(AccountService.class).to(PersistentAccountService.class);
+    bind(SessionService.class).to(PersistentSessionService.class);
+    bind(AuthorisationService.class).to(PersistentAccountService.class);
   }
 }

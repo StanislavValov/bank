@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
@@ -36,9 +39,9 @@ public class LogoutControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    logoutController = new LogoutController(currentUserProvider, sessionService);
-    user = new User(null,null);
-    cookie = new Cookie("Torbalan", "123");
+    logoutController = new LogoutController(currentUserProvider, sessionService, siteMap);
+    user = new User("Stanislav","123456");
+    cookie = new Cookie("Stanislav", "123456");
     cookies = new Cookie[]{cookie};
     currentUser = new CurrentUser(user);
   }
@@ -58,11 +61,10 @@ public class LogoutControllerTest {
 
         oneOf(response).addCookie(cookie);
 
-        oneOf(siteMap).loginJspLabel();
+        oneOf(siteMap).loginForm();
         will(returnValue("/bank/Login.html"));
-
-        oneOf(response).sendRedirect("/bank/Login.html");
       }
     });
+      logoutController.logout(request,response);
   }
 }

@@ -2,68 +2,77 @@ package com.clouway.persistence;
 
 import com.clouway.core.BankService;
 import com.clouway.core.User;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
+import com.mongodb.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.net.UnknownHostException;
 
 /**
- * Created by Stanislav Valov <hisazzul@gmail.com>
+ * Created by hisazzul@gmail.com on 7/14/14.
  */
-@Singleton
 public class PersistentBankService implements BankService {
 
-  private final Provider<Connection> connectionProvider;
+    private MongoClient mongoClient;
+    private DBCollection accounts;
+    private DB database;
 
-  @Inject
-  public PersistentBankService(Provider<Connection> connectionProvider) {
-    this.connectionProvider = connectionProvider;
-  }
+    @Override
+    public void deposit(User user, double amount) {
 
-  @Override
-  public void deposit(User user, double amount) {
-    PreparedStatement preparedStatement = null;
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement
-              ("update accounts set amount=amount+? where userName=?");
-      preparedStatement.setDouble(1, amount);
-      preparedStatement.setString(2, user.getUserName());
-      preparedStatement.execute();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (preparedStatement != null) {
         try {
-          preparedStatement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-  }
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            database.requestStart();
+            accounts = database.getCollection("accounts");
 
-  @Override
-  public void withdraw(User user, double amount) {
-    PreparedStatement preparedStatement = null;
-    try {
-      preparedStatement = connectionProvider.get().prepareStatement
-              ("update accounts set amount=amount-? where userName=? and " + amount + " <= amount");
-      preparedStatement.setDouble(1, amount);
-      preparedStatement.setString(2, user.getUserName());
-      preparedStatement.execute();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (preparedStatement != null) {
-        try {
-          preparedStatement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
+            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", amount));
+            accounts.update(new BasicDBObject().append("userName", user.getUserName()), query);
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
-      }
     }
-  }
+
+    @Override
+    public void withdraw(User user, double amount) {
+
+        try {
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            database.requestStart();
+            accounts = database.getCollection("accounts");
+
+            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", -amount));
+            accounts.update(new BasicDBObject().append("userName", user.getUserName()), query);
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public double getAccountAmount(User user) {
+
+        try {
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            accounts = database.getCollection("accounts");
+
+            BasicDBObject query = new BasicDBObject();
+            query.append("userName", user.getUserName());
+
+            BasicDBObject field = new BasicDBObject();
+            field.put("amount", user.getUserName());
+
+            DBCursor cursor = accounts.find(query, field);
+
+            while (cursor.hasNext()) {
+                BasicDBObject dbObject = (BasicDBObject) cursor.next();
+                return Double.parseDouble(String.valueOf(dbObject.get("amount")));
+            }
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

@@ -14,97 +14,80 @@ import org.junit.Test;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 public class RegistrationControllerTest {
 
-  Mockery context = new JUnit4Mockery();
-  RegistrationController registrationController;
-  User user;
-  SiteMap siteMap;
+    Mockery context = new JUnit4Mockery();
+    RegistrationController registrationController;
+    User user;
 
+    AccountService accountService = context.mock(AccountService.class);
+    BankValidator bankValidator = context.mock(BankValidator.class);
+    SiteMap siteMap = context.mock(SiteMap.class);
 
-  HttpServletRequest request = context.mock(HttpServletRequest.class);
-  HttpServletResponse response = context.mock(HttpServletResponse.class);
-  AccountService accountService = context.mock(AccountService.class);
-  BankValidator bankValidator = context.mock(BankValidator.class);
+    @Before
+    public void setUp() throws Exception {
+        user = new User("Stanislav","123456");
+        user.setPassword("123456");
+        registrationController = new RegistrationController(accountService, bankValidator, siteMap);
+        registrationController.setUser(user);
+    }
 
-  @Before
-  public void setUp() throws Exception {
-    siteMap = new LabelMap();
-//    user = new User();
-    registrationController = new RegistrationController(accountService, bankValidator, siteMap);
-  }
+    @Test
+    public void createAccountSuccessful() {
 
-  @Test
-  public void createAccountSuccessful() throws Exception {
+        context.checking(new Expectations() {
+            {
+                oneOf(bankValidator).isUserCorrect(user);
+                will(returnValue(true));
 
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.password());
-        will(returnValue(user.getPassword()));
+                oneOf(accountService).userExists(user);
+                will(returnValue(false));
 
-        oneOf(request).getParameter(siteMap.userName());
-        will(returnValue(user.getUserName()));
+                oneOf(accountService).registerUser(user);
 
-        oneOf(bankValidator).isUserCorrect(user);
-        will(returnValue(true));
+                oneOf(siteMap).loginForm();
+                will(returnValue("/bank/Login.html"));
+            }
+        });
+        assertThat(registrationController.register(), is("/bank/Login.html"));
+    }
 
-        oneOf(accountService).userExists(user);
-        will(returnValue(false));
+    @Test
+    public void validateDataFailed() {
 
-        oneOf(accountService).registerUser(user);
+        context.checking(new Expectations() {
+            {
+                oneOf(bankValidator).isUserCorrect(user);
+                will(returnValue(false));
 
-        oneOf(response).sendRedirect(siteMap.loginJspLabel());
+                oneOf(siteMap).registrationForm();
+                will(returnValue("/registration"));
+            }
+        });
+        assertThat(registrationController.register(),is("/registration"));
+    }
 
-        oneOf(request).getRequestDispatcher(siteMap.registrationJspLabel());
-      }
-    });
-  }
+    @Test
+    public void userAlreadyExists() {
 
-  @Test
-  public void validateDataFailed() throws Exception {
+        context.checking(new Expectations() {
+            {
+                oneOf(bankValidator).isUserCorrect(user);
+                will(returnValue(true));
 
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.password());
-        will(returnValue(user.getPassword()));
+                oneOf(accountService).userExists(user);
+                will(returnValue(true));
 
-        oneOf(request).getParameter(siteMap.userName());
-        will(returnValue(user.getUserName()));
-
-        oneOf(bankValidator).isUserCorrect(user);
-        will(returnValue(false));
-
-        oneOf(request).setAttribute(siteMap.errorLabel(), siteMap.validateErrorMessage());
-
-        oneOf(request).getRequestDispatcher(siteMap.registrationJspLabel());
-      }
-    });
-  }
-
-  @Test
-  public void userAlreadyExists() throws Exception {
-
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.password());
-        will(returnValue(user.getPassword()));
-
-        oneOf(request).getParameter(siteMap.userName());
-        will(returnValue(user.getUserName()));
-
-        oneOf(bankValidator).isUserCorrect(user);
-        will(returnValue(true));
-
-        oneOf(accountService).userExists(user);
-        will(returnValue(true));
-
-        oneOf(request).setAttribute(siteMap.errorLabel(), siteMap.userExistErrorLabel());
-
-        oneOf(request).getRequestDispatcher(siteMap.registrationJspLabel());
-      }
-    });
-  }
+                oneOf(siteMap).registrationForm();
+                will(returnValue("/registration"));
+            }
+        });
+        assertThat(registrationController.register(),is("/registration"));
+    }
 }

@@ -11,13 +11,7 @@ public interface SiteMap {
 
   String userName();
 
-  String userAccountController();
-
-  String identificationFailed();
-
-  String errorLabel();
-
-  String loginJspLabel();
+  String loginForm();
 
 
   String depositLabel();
@@ -26,22 +20,14 @@ public interface SiteMap {
 
   String transactionAmountLabel();
 
-  String successfulTransactionLabel();
-
-  String amountErrorLabel();
-
-  String amountErrorMessage();
-
   String transactionErrorLabel();
 
 
-  String userJspLabel();
+  String userHtmlForm();
 
-  String userExistErrorLabel();
-
-  String validateErrorMessage();
-
-  String registrationJspLabel();
+  String registrationForm();
 
   String logoutController();
+
+  String bankController();
 }

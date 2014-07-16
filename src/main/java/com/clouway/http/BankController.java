@@ -26,16 +26,16 @@ public class BankController {
 
     private BankService bankService;
     private BankValidator validator;
-    private AccountService accountService;
     private Provider<CurrentUser> currentUserProvider;
+    private SiteMap siteMap;
     private Account account = new Account();
 
     @Inject
-    public BankController(BankService bankService, BankValidator validator, AccountService accountService, Provider<CurrentUser> currentUserProvider) {
+    public BankController(BankService bankService, BankValidator validator, Provider<CurrentUser> currentUserProvider, SiteMap siteMap) {
         this.bankService = bankService;
         this.validator = validator;
-        this.accountService = accountService;
         this.currentUserProvider = currentUserProvider;
+        this.siteMap = siteMap;
     }
 
     @Post
@@ -56,13 +56,13 @@ public class BankController {
             }
 
         } else {
-            return "/bank/TransactionError.html";
+            return siteMap.transactionErrorLabel();
         }
-        return "/bankController";
+        return siteMap.bankController();
     }
 
     public double getUserAccountAmount() {
-        return accountService.getAccountAmount(currentUserProvider.get().getUser());
+        return bankService.getAccountAmount(currentUserProvider.get().getUser());
     }
 
     public Account getAccount() {

@@ -13,8 +13,7 @@ import org.junit.runners.Suite;
         LoginControllerTest.class,
         RegistrationControllerTest.class,
         LogoutControllerTest.class,
-        SecurityFilterTest.class,
-        UserAccountControllerTest.class
+        SecurityFilterTest.class
 })
 public class TestSuite {
 }

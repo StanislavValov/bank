@@ -1,233 +1,162 @@
 package com.clouway.persistence;
 
-import com.clouway.core.SessionService;
 import com.clouway.core.ClockUtil;
+import com.clouway.core.SessionService;
 import com.clouway.core.User;
-import com.clouway.http.AuthorisationService;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.mongodb.*;
 
-import javax.servlet.http.Cookie;
-import java.sql.*;
+import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Stanislav Valov <hisazzul@gmail.com>
+ * Created by hisazzul@gmail.com on 7/11/14.
  */
 @Singleton
-public class PersistentSessionService implements SessionService, AuthorisationService {
+public class PersistentSessionService implements SessionService {
 
-    private final Provider<Connection> connectionProvider;
-    private ClockUtil clockUtil;
+    MongoClient mongoClient;
+    DBCollection sessions;
+    ClockUtil clockUtil;
+    DB database;
 
     @Inject
-    public PersistentSessionService(Provider<Connection> connectionProvider, ClockUtil clockUtil) {
-        this.connectionProvider = connectionProvider;
+    public PersistentSessionService(ClockUtil clockUtil) {
         this.clockUtil = clockUtil;
     }
 
     @Override
     public void removeSession(String sessionId) {
-        PreparedStatement preparedStatement = null;
-        String sql = "delete from sessions where sessionId=?";
 
         try {
-            preparedStatement = connectionProvider.get().prepareStatement(sql);
-            preparedStatement.setString(1, sessionId);
-            preparedStatement.execute();
-        } catch (SQLException e) {
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            sessions = database.getCollection("sessions");
+
+            BasicDBObject query = new BasicDBObject("sessionId", sessionId);
+
+            sessions.remove(query);
+
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
     @Override
     public User findUserAssociatedWithSession(String sessionId) {
-        PreparedStatement preparedStatement = null;
-        String sql = "select userName,sessionId from sessions where sessionId=?";
-        User searchedUser = null;
+
         try {
-            preparedStatement = connectionProvider.get().prepareStatement(sql);
-            preparedStatement.setString(1, sessionId);
-            preparedStatement.execute();
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            sessions = database.getCollection("sessions");
 
-            ResultSet resultSet = preparedStatement.getResultSet();
+            BasicDBObject query = new BasicDBObject();
+            query.append("sessionId", sessionId);
 
-            while (resultSet.next()) {
-                searchedUser = new User(resultSet.getString("userName"), resultSet.getString("sessionId"));
+            BasicDBObject fields = new BasicDBObject();
+            fields.put("userName", 1);
+            fields.put("sessionId", 2);
+
+            DBCursor cursor = sessions.find(query, fields);
+
+            while (cursor.hasNext()) {
+                BasicDBObject dbObject = (BasicDBObject) cursor.next();
+                return new User(dbObject.getString("userName"), dbObject.getString("sessionId"));
             }
-        } catch (SQLException e) {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-        return searchedUser;
+        return null;
     }
 
     @Override
-    public Map<String, Timestamp> getSessionsExpirationTime() {
-        PreparedStatement preparedStatement = null;
-        String sql = "SELECT sessionId,expirationDate from sessions";
-        Map<String, Timestamp> expTime = new HashMap<String, Timestamp>();
+    public Map<String, Date> getSessionsExpirationTime() {
+
+        Map<String, Date> result = new HashMap<String, Date>();
 
         try {
-            preparedStatement = connectionProvider.get().prepareStatement(sql);
-            preparedStatement.execute();
-            while (preparedStatement.getResultSet().next()) {
-                expTime.put(preparedStatement.getResultSet().getString("sessionId")
-                        , preparedStatement.getResultSet().getTimestamp("expirationDate"));
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            sessions = database.getCollection("sessions");
+
+            BasicDBObject query = new BasicDBObject();
+
+            BasicDBObject fields = new BasicDBObject();
+            fields.put("sessionId", 1);
+            fields.put("expirationTime", 2);
+
+            DBCursor cursor = sessions.find(query, fields);
+
+            while (cursor.hasNext()) {
+                BasicDBObject dbObject = (BasicDBObject) cursor.next();
+                result.put((String) dbObject.get("sessionId"), (Date) dbObject.get("expirationTime"));
             }
-        } catch (SQLException e) {
+
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-        return expTime;
+        return result;
     }
 
     @Override
     public void resetSessionLife(String sessionId) {
-        PreparedStatement preparedStatement = null;
-        String sql = "UPDATE sessions set expirationDate=? where sessionId=?";
-
         try {
-            preparedStatement = connectionProvider.get().prepareStatement(sql);
-            preparedStatement.setTimestamp(1, clockUtil.expirationDate());
-            preparedStatement.setString(2, sessionId);
-            preparedStatement.execute();
-        } catch (SQLException e) {
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            sessions = database.getCollection("sessions");
+
+            BasicDBObject query = new BasicDBObject()
+                    .append("$set", new BasicDBObject().append("expirationTime", clockUtil.expirationDate()));
+            sessions.update(new BasicDBObject().append("sessionId", sessionId), query);
+
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-    }
-
-    @Override
-    public boolean isUserAuthorised(User user) {
-        PreparedStatement preparedStatement = null;
-
-        String sql = "select userName,password " +
-                "from accounts " +
-                "where userName=?";
-        try {
-            preparedStatement = connectionProvider.get().prepareStatement(sql);
-            preparedStatement.setString(1, user.getUserName());
-            preparedStatement.execute();
-
-            while (preparedStatement.getResultSet().next()) {
-                if (preparedStatement.getResultSet().getString("password").equals(user.getPassword())) {
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return false;
     }
 
     @Override
     public int getSessionsCount() {
-        PreparedStatement preparedStatement = null;
-
-        String sql = "select COUNT(DISTINCT userName) from sessions limit 1";
-
+        int counter=0;
         try {
-            preparedStatement = connectionProvider.get().prepareStatement(sql);
-            preparedStatement.execute();
-
-            while (preparedStatement.getResultSet().next()) {
-                return preparedStatement.getResultSet().getInt("COUNT(DISTINCT userName)");
-            }
-
-        } catch (SQLException e) {
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            sessions = database.getCollection("sessions");
+            counter = (int) sessions.count();
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-        return 0;
+        return counter;
     }
 
     @Override
-    public void addUserAssociatedWithSession(User user) {
-        PreparedStatement preparedStatement = null;
+    public void addUserAssociatedWithSession(User user, String sessionId) {
         try {
-            preparedStatement = connectionProvider.get().prepareStatement("insert into sessions values (?,?,?)");
-            preparedStatement.setString(1, user.getSessionId());
-            preparedStatement.setTimestamp(2, clockUtil.expirationDate());
-            preparedStatement.setString(3, user.getUserName());
-            preparedStatement.execute();
-        } catch (SQLException e) {
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            sessions = database.getCollection("sessions");
+
+            BasicDBObject doc = new BasicDBObject()
+                    .append("userName", user.getUserName())
+                    .append("sessionId", sessionId)
+                    .append("expirationTime", clockUtil.expirationDate());
+            sessions.insert(doc);
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
-    public void cleanSessionsTable() {
-        PreparedStatement preparedStatement = null;
-        String sql = "delete from sessions";
-
+    public void cleanSessionsTable(){
         try {
-            preparedStatement = connectionProvider.get().prepareStatement(sql);
-            preparedStatement.execute();
+            mongoClient = new MongoClient();
+            database = mongoClient.getDB("bank");
+            sessions = database.getCollection("sessions");
 
-        } catch (SQLException e) {
+            sessions.drop();
+        } catch (UnknownHostException e) {
             e.printStackTrace();
-        } finally {
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }

@@ -2,86 +2,75 @@ package com.clouway.persistence;
 
 import com.clouway.core.ClockUtil;
 import com.clouway.core.User;
-import com.google.inject.util.Providers;
-import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.Timestamp;
+import java.util.Date;
 
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
- * Created by Stanislav Valov <hisazzul@gmail.com>
+ * Created by hisazzul@gmail.com on 7/16/14.
  */
 public class PersistentSessionServiceIT {
 
-  PersistentSessionService sessionService;
-  PersistentAccountService accountService;
-  User user;
-  MysqlConnectionPoolDataSource dataSource;
-  Connection connection;
-  ClockUtil clockUtil;
+    PersistentSessionService sessionService;
+    PersistentAccountService accountService;
+    User user;
+    ClockUtil clockUtil;
 
-  @Before
-  public void setUp() throws Exception {
-//    user = new User();
-    dataSource = new MysqlConnectionPoolDataSource();
+    @Before
+    public void setUp() throws Exception {
+        user = new User("Thor", "someId");
 
-    dataSource.setUser("root");
-    dataSource.setPassword("clouway.com");
-    dataSource.setDatabaseName("bank");
-    dataSource.setServerName("localhost");
+        clockUtil = new ClockUtil() {
 
-    clockUtil = new ClockUtil() {
-      @Override
-      public Timestamp currentTime() {
-        return null;
-      }
+            @Override
+            public Date currentTime() {
+                return CalendarUtil.june(2014, 5);
+            }
 
-      @Override
-      public Timestamp expirationDate() {
-        return CalendarUtil.june(2014, 5);
-      }
-    };
+            @Override
+            public Date expirationDate() {
+                return CalendarUtil.june(2014, 6);
+            }
+        };
 
-    connection = dataSource.getConnection();
-    sessionService = new PersistentSessionService(Providers.of(connection), clockUtil);
-    accountService = new PersistentAccountService(Providers.of(connection));
+        sessionService = new PersistentSessionService(clockUtil);
+        accountService = new PersistentAccountService();
 
-    sessionService.cleanSessionsTable();
-    accountService.cleanAccountsTable();
-    accountService.registerUser(user);
-    sessionService.isUserAuthorised(user);
-  }
+        sessionService.cleanSessionsTable();
+        accountService.deleteUser(user);
+        accountService.registerUser(user);
+        sessionService.addUserAssociatedWithSession(user, user.getSessionId());
+    }
 
-  @Test
-  public void findUserAssociatedWithSession() {
-    assertThat(sessionService.findUserAssociatedWithSession("someId"), is(user));
-  }
+    @Test
+    public void findUserAssociatedWithSession() {
+        assertThat(sessionService.findUserAssociatedWithSession("someId"), is(user));
+    }
 
-  @Test
-  public void getSessionsExpirationTime() {
-    assertThat(sessionService.getSessionsExpirationTime().get(user.getSessionId()), is(CalendarUtil.june(2014, 5)));
-  }
+    @Test
+    public void getSessionsExpirationTime() {
+        assertThat(sessionService.getSessionsExpirationTime().get(user.getSessionId()), is(CalendarUtil.june(2014, 6)));
+    }
 
-  @Test
-  public void sessionLifeWasReset() {
-    sessionService.resetSessionLife(user.getSessionId());
-    assertThat(sessionService.getSessionsExpirationTime().get(user.getSessionId()), is(CalendarUtil.june(2014, 5)));
-  }
+    @Test
+    public void sessionLifeWasReset() {
+        sessionService.resetSessionLife(user.getSessionId());
+        assertThat(sessionService.getSessionsExpirationTime().get(user.getSessionId()), is(CalendarUtil.june(2014, 6)));
+    }
 
-  @Test
-  public void removeSessionIdSuccessful() {
-    sessionService.removeSession(user.getSessionId());
-    assertNull(sessionService.findUserAssociatedWithSession(user.getSessionId()));
-  }
+    @Test
+    public void removeSessionIdSuccessful() {
+        sessionService.removeSession(user.getSessionId());
+        assertNull(sessionService.findUserAssociatedWithSession(user.getSessionId()));
+    }
 
-  @Test
-  public void getSessionsCount() {
-    assertThat(sessionService.getSessionsCount(), is(1));
-  }
+    @Test
+    public void getSessionsCount() {
+        assertThat(sessionService.getSessionsCount(), is(1));
+    }
 }

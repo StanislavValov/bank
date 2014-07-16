@@ -55,8 +55,6 @@ public class User {
         if (sessionId != null && user.sessionId != null) {
             if (!sessionId.equals(user.sessionId)) return false;
         }
-        if (!userName.equals(user.userName)) return false;
-
-        return true;
+        return userName.equals(user.userName);
     }
 }

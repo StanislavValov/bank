@@ -3,6 +3,7 @@ package com.clouway.core;
 import com.clouway.core.User;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -14,11 +15,11 @@ public interface SessionService {
 
     User findUserAssociatedWithSession(String sessionId);
 
-    Map<String, Timestamp> getSessionsExpirationTime();
+    Map<String, Date> getSessionsExpirationTime();
 
     void resetSessionLife(String sessionId);
 
     int getSessionsCount();
 
-    void addUserAssociatedWithSession(User user);
+    void addUserAssociatedWithSession(User user, String sessionId);
 }

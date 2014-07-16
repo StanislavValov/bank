@@ -21,118 +21,132 @@ import java.util.Map;
  */
 public class SecurityFilterTest {
 
-  Mockery context = new JUnit4Mockery();
-  SecurityFilter securityFilter;
-  SiteMap siteMap;
-  User user;
-  CurrentUser currentUser;
-  Map<String, Timestamp> sessionsExpirationTime;
+    Mockery context = new JUnit4Mockery();
+    SecurityFilter securityFilter;
+    User user;
+    CurrentUser currentUser;
+    Map<String, Timestamp> sessionsExpirationTime;
 
-  ServletRequest request = context.mock(ServletRequest.class);
-  HttpServletResponse response = context.mock(HttpServletResponse.class);
-  FilterChain filterChain = context.mock(FilterChain.class);
-  SessionService sessionService = context.mock(SessionService.class);
-  Provider provider = context.mock(Provider.class);
-  ClockUtil clockUtil = context.mock(ClockUtil.class);
+    ServletRequest request = context.mock(ServletRequest.class);
+    HttpServletResponse response = context.mock(HttpServletResponse.class);
+    FilterChain filterChain = context.mock(FilterChain.class);
+    SessionService sessionService = context.mock(SessionService.class);
+    Provider provider = context.mock(Provider.class);
+    ClockUtil clockUtil = context.mock(ClockUtil.class);
+    SiteMap siteMap = context.mock(SiteMap.class);
 
-  @Before
-  public void setUp() throws Exception {
-    sessionsExpirationTime = new HashMap<String, Timestamp>();
-//    user = new User();
-    currentUser = new CurrentUser(user);
-    siteMap = new LabelMap();
-    securityFilter = new SecurityFilter(provider, sessionService, siteMap, clockUtil);
-  }
+    @Before
+    public void setUp() throws Exception {
+        sessionsExpirationTime = new HashMap<String, Timestamp>();
+        user = new User();
+        currentUser = new CurrentUser(user);
+        securityFilter = new SecurityFilter(provider, sessionService, siteMap, clockUtil);
+    }
 
-  @Test
-  public void userIsNotFound() throws Exception {
+    @Test
+    public void userIsNotFound() throws Exception {
 
-    context.checking(new Expectations() {
-      {
-        oneOf(provider).get();
-        will(returnValue(new CurrentUser(null)));
+        context.checking(new Expectations() {
+            {
+                oneOf(provider).get();
+                will(returnValue(new CurrentUser(null)));
 
-        oneOf(response).sendRedirect(siteMap.loginJspLabel());
-      }
-    });
-    securityFilter.doFilter(request, response, filterChain);
-  }
+                oneOf(sessionService).getSessionsExpirationTime();
 
-  @Test
-  public void sessionWasExpired() throws Exception {
+                oneOf(clockUtil).currentTime();
 
-    final Timestamp expirationTime = new Timestamp(System.currentTimeMillis() - 5 * 60 * 1000);
-    final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-    sessionsExpirationTime.put(user.getSessionId(), expirationTime);
+                oneOf(siteMap).loginForm();
+                will(returnValue("/bank/Login.html"));
 
-    context.checking(new Expectations() {
-      {
-        oneOf(provider).get();
-        will(returnValue(currentUser));
+                oneOf(response).sendRedirect("/bank/Login.html");
+            }
+        });
+        securityFilter.doFilter(request, response, filterChain);
+    }
 
-        oneOf(sessionService).getSessionsExpirationTime();
-        will(returnValue(sessionsExpirationTime));
+    @Test
+    public void sessionWasExpired() throws Exception {
 
-        oneOf(clockUtil).currentTime();
-        will(returnValue(currentTime));
+        final Timestamp expirationTime = new Timestamp(System.currentTimeMillis() - 5 * 60 * 1000);
+        final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        sessionsExpirationTime.put(user.getSessionId(), expirationTime);
 
-        oneOf(sessionService).removeSession(user.getSessionId());
+        context.checking(new Expectations() {
+            {
+                oneOf(provider).get();
+                will(returnValue(currentUser));
 
-        oneOf(request).getRequestDispatcher(siteMap.logoutController());
-      }
-    });
-    securityFilter.doFilter(request, response, filterChain);
-  }
+                oneOf(sessionService).getSessionsExpirationTime();
+                will(returnValue(sessionsExpirationTime));
 
-  @Test
-  public void sessionWasReset() throws Exception {
+                oneOf(clockUtil).currentTime();
+                will(returnValue(currentTime));
 
-    final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000);
-    final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-    sessionsExpirationTime.put(user.getSessionId(), expirationTIme);
+                oneOf(sessionService).removeSession(user.getSessionId());
 
-    context.checking(new Expectations() {
-      {
-        oneOf(provider).get();
-        will(returnValue(currentUser));
+                oneOf(siteMap).logoutController();
+                will(returnValue("/logout"));
 
-        oneOf(sessionService).getSessionsExpirationTime();
-        will(returnValue(sessionsExpirationTime));
+                oneOf(response).sendRedirect("/logout");
+            }
+        });
+        securityFilter.doFilter(request, response, filterChain);
+    }
 
-        oneOf(clockUtil).currentTime();
-        will(returnValue(currentTime));
+    @Test
+    public void sessionWasReset() throws Exception {
 
-        oneOf(sessionService).resetSessionLife(user.getSessionId());
+        final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000);
+        final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        sessionsExpirationTime.put(user.getSessionId(), expirationTIme);
 
-        oneOf(filterChain).doFilter(request, response);
-      }
-    });
-    securityFilter.doFilter(request, response, filterChain);
-  }
+        context.checking(new Expectations() {
+            {
+                oneOf(provider).get();
+                will(returnValue(currentUser));
 
-  @Test
-  public void expiredSessionWasDeleted() throws Exception {
+                oneOf(sessionService).getSessionsExpirationTime();
+                will(returnValue(sessionsExpirationTime));
 
-    final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() - 1);
-    final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-    sessionsExpirationTime.put(user.getSessionId(), expirationTIme);
+                oneOf(clockUtil).currentTime();
+                will(returnValue(currentTime));
 
-    context.checking(new Expectations() {
-      {
-        oneOf(provider).get();
-        will(returnValue(currentUser));
+                oneOf(sessionService).resetSessionLife(user.getSessionId());
 
-        oneOf(sessionService).getSessionsExpirationTime();
-        will(returnValue(sessionsExpirationTime));
+                oneOf(filterChain).doFilter(request, response);
+            }
+        });
+        securityFilter.doFilter(request, response, filterChain);
+    }
 
-        oneOf(clockUtil).currentTime();
-        will(returnValue(currentTime));
+    @Test
+    public void expiredSessionWasDeleted() throws Exception {
 
-        oneOf(request).getRequestDispatcher(siteMap.logoutController());
+        final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() - 1);
+        final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        sessionsExpirationTime.put(user.getSessionId(), expirationTIme);
 
-        oneOf(sessionService).removeSession(user.getSessionId());
-      }
-    });
-    securityFilter.doFilter(request, response, filterChain);
-  }
+        context.checking(new Expectations() {
+            {
+                oneOf(provider).get();
+                will(returnValue(currentUser));
+
+                oneOf(sessionService).getSessionsExpirationTime();
+                will(returnValue(sessionsExpirationTime));
+
+                oneOf(clockUtil).currentTime();
+                will(returnValue(currentTime));
+
+                oneOf(sessionService).resetSessionLife(null);
+
+                oneOf(siteMap).logoutController();
+                will(returnValue("/logout"));
+
+                oneOf(filterChain).doFilter(request,response);
+
+                oneOf(sessionService).removeSession(user.getSessionId());
+            }
+        });
+        securityFilter.doFilter(request, response, filterChain);
+    }
 }

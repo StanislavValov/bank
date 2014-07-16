@@ -8,109 +8,89 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 public class BankControllerTest {
 
-  Mockery context = new JUnit4Mockery();
-  BankController bankController = null;
-  User user;
-  SiteMap siteMap;
-  double amount;
-  CurrentUser currentUser;
+    Mockery context = new JUnit4Mockery();
+    BankController bankController = null;
+    User user;
+    CurrentUser currentUser;
 
-  HttpServletRequest request = context.mock(HttpServletRequest.class);
-  HttpServletResponse response = context.mock(HttpServletResponse.class);
-  BankService bankService = context.mock(BankService.class);
-  BankValidator bankValidator = context.mock(BankValidator.class);
-  Provider provider = context.mock(Provider.class);
+    BankService bankService = context.mock(BankService.class);
+    BankValidator bankValidator = context.mock(BankValidator.class);
+    Provider provider = context.mock(Provider.class);
+    SiteMap siteMap = context.mock(SiteMap.class);
 
-  @Before
-  public void setUp() throws Exception {
-    siteMap = new LabelMap();
-    amount = 10.101;
-//    user = new User();
-    currentUser = new CurrentUser(user);
-//    bankController = new BankController(bankService, bankValidator, provider, siteMap);
-  }
+    @Before
+    public void setUp() throws Exception {
+        user = new User();
+        currentUser = new CurrentUser(user);
+        bankController = new BankController(bankService, bankValidator, provider, siteMap);
+    }
 
-  @Test
-  public void transactionAmountIsNotCorrect() throws Exception {
+    @Test
+    public void transactionAmountIsNotCorrect() {
 
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.transactionAmountLabel());
-        will(returnValue(amount));
+        context.checking(new Expectations() {
+            {
+                oneOf(provider).get();
+                will(returnValue(currentUser));
 
-        oneOf(provider).get();
-        will(returnValue(currentUser));
+                oneOf(siteMap).transactionAmountLabel();
+                will(returnValue("amount"));
 
-        oneOf(bankValidator).isAmountValid(amount);
-        will(returnValue(false));
+                oneOf(bankValidator).isAmountValid(0);
+                will(returnValue(false));
 
-        oneOf(request).setAttribute(siteMap.amountErrorLabel(), siteMap.amountErrorMessage());
+                oneOf(siteMap).transactionErrorLabel();
+                will(returnValue("/bank/TransactionError.html"));
+            }
+        });
+        assertThat(bankController.accountOperation(), is("/bank/TransactionError.html"));
+    }
 
-        oneOf(request).getRequestDispatcher(siteMap.transactionErrorLabel());
-      }
-    });
-//    bankController.accountOperation(request, response);
-  }
+    @Test
+    public void depositSuccess() {
 
-  @Test
-  public void depositSuccess() throws Exception {
+        context.checking(new Expectations() {
+            {
+                oneOf(provider).get();
+                will(returnValue(currentUser));
 
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.transactionAmountLabel());
-        will(returnValue(amount));
+                oneOf(bankValidator).isAmountValid(0);
+                will(returnValue(true));
 
-        oneOf(provider).get();
-        will(returnValue(currentUser));
+                oneOf(bankService).deposit(user, 0);
 
-        oneOf(bankValidator).isAmountValid(amount);
-        will(returnValue(true));
+                oneOf(siteMap).bankController();
+                will(returnValue("/bankController"));
+            }
+        });
+        assertThat(bankController.accountOperation(), is("/bankController"));
+    }
 
-        oneOf(request).getParameter(siteMap.depositLabel());
-        will(returnValue(siteMap.depositLabel()));
+    @Test
+    public void withdrawSuccess() {
 
-        oneOf(bankService).deposit(user, amount);
+        context.checking(new Expectations() {
+            {
+                oneOf(provider).get();
+                will(returnValue(currentUser));
 
-        oneOf(request).getParameter(siteMap.withdrawLabel());
-        will(returnValue(null));
+                oneOf(bankValidator).isAmountValid(0);
+                will(returnValue(true));
 
-        oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
-      }
-    });
-  }
+                oneOf(bankService).withdraw(user, 0);
 
-  @Test
-  public void withdrawSuccess() throws Exception {
-
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getParameter(siteMap.transactionAmountLabel());
-        will(returnValue(amount));
-
-        oneOf(provider).get();
-        will(returnValue(currentUser));
-
-        oneOf(bankValidator).isAmountValid(amount);
-        will(returnValue(true));
-
-        oneOf(request).getParameter(siteMap.depositLabel());
-        will(returnValue(null));
-
-        oneOf(request).getParameter(siteMap.withdrawLabel());
-        will(returnValue(siteMap.withdrawLabel()));
-
-        oneOf(bankService).withdraw(user, amount);
-
-        oneOf(response).sendRedirect(siteMap.successfulTransactionLabel());
-      }
-    });
-  }
+                oneOf(siteMap).bankController();
+                will(returnValue("/bankController"));
+            }
+        });
+        assertThat(bankController.accountOperation(), is("/bankController"));
+    }
 }
