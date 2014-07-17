@@ -53,4 +53,8 @@ public class User {
         }
         return userName.equals(user.userName);
     }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
 }
