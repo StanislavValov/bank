@@ -54,7 +54,5 @@ public class User {
         return userName.equals(user.userName);
     }
 
-    public void print(){
-        System.out.println(123);
-    }
+
 }
