@@ -54,5 +54,12 @@ public class User {
         return userName.equals(user.userName);
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                '}';
+    }
 }
