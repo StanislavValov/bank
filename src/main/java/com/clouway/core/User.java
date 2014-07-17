@@ -60,6 +60,18 @@ public class User {
                 "userName='" + userName + '\'' +
                 ", password='" + password + '\'' +
                 ", sessionId='" + sessionId + '\'' +
-                '}';
+                '}';}
+    
+    public void print(){
+        System.out.println(123);
     }
+
+    public void setSomeTestMethod(){
+
+    }
+
+    public int getId(){
+        return 123;
+    }
+
 }
