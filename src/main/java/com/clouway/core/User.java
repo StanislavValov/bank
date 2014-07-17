@@ -53,4 +53,8 @@ public class User {
         }
         return userName.equals(user.userName);
     }
+
+    private String getId(){
+        return "bla";
+    }
 }
