@@ -53,17 +53,4 @@ public class User {
         }
         return userName.equals(user.userName);
     }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public void setSomeTestMethod(){
-
-    }
-
-    public int getId(){
-        return 123;
-    }
-
 }
