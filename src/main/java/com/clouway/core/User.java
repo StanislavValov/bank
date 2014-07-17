@@ -58,4 +58,8 @@ public class User {
         this.sessionId = sessionId;
     }
 
+    public int getId() {
+        return 123;
+    }
+
 }
