@@ -5,7 +5,7 @@ package com.clouway.core;
  */
 public class Account {
 
-    private double transactionAmount;
+    private String transactionAmount;
     private String deposit;
     private String withdraw;
 
@@ -25,11 +25,11 @@ public class Account {
         this.withdraw = withdraw;
     }
 
-    public double getTransactionAmount() {
+    public String getTransactionAmount() {
         return transactionAmount;
     }
 
-    public void setTransactionAmount(double transactionAmount) {
+    public void setTransactionAmount(String transactionAmount) {
         this.transactionAmount = transactionAmount;
     }
 }

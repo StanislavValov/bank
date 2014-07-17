@@ -47,7 +47,7 @@ public class BankController {
 
             if (account.getDeposit() != null) {
                 account.setDeposit(null);
-                bankService.deposit(user,account.getTransactionAmount());
+                bankService.deposit(user, account.getTransactionAmount());
             }
 
             if (account.getWithdraw() != null) {

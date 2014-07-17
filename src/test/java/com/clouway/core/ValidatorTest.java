@@ -20,12 +20,12 @@ public class ValidatorTest {
 
     @Test
     public void correctAmount() {
-        assertThat(validator.isAmountValid(5.12), is(true));
+        assertThat(validator.isAmountValid("5.12"), is(true));
     }
 
     @Test
     public void incorrectAmount() {
-        assertThat(validator.isAmountValid(5.555), is(false));
+        assertThat(validator.isAmountValid("5.555"), is(false));
     }
 
     @Test

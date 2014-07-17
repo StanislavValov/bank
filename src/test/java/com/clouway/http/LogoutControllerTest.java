@@ -6,6 +6,7 @@ import com.google.inject.Provider;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.internal.CaptureControl;
 import org.junit.Before;
 import org.junit.Test;
 

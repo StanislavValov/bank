@@ -20,6 +20,7 @@ public class BankControllerTest {
     BankController bankController = null;
     User user;
     CurrentUser currentUser;
+    Account account;
 
     BankService bankService = context.mock(BankService.class);
     BankValidator bankValidator = context.mock(BankValidator.class);
@@ -29,6 +30,7 @@ public class BankControllerTest {
     @Before
     public void setUp() throws Exception {
         user = new User();
+        account = new Account();
         currentUser = new CurrentUser(user);
         bankController = new BankController(bankService, bankValidator, provider, siteMap);
     }
@@ -41,11 +43,11 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(currentUser));
 
+                oneOf(bankValidator).isAmountValid(null);
+                will(returnValue(false));
+
                 oneOf(siteMap).transactionAmountLabel();
                 will(returnValue("amount"));
-
-                oneOf(bankValidator).isAmountValid(0);
-                will(returnValue(false));
 
                 oneOf(siteMap).transactionErrorLabel();
                 will(returnValue("/bank/TransactionError.html"));
@@ -62,10 +64,10 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(currentUser));
 
-                oneOf(bankValidator).isAmountValid(0);
+                oneOf(bankValidator).isAmountValid(null);
                 will(returnValue(true));
 
-                oneOf(bankService).deposit(user, 0);
+                oneOf(bankService).deposit(user, "5");
 
                 oneOf(siteMap).bankController();
                 will(returnValue("/bankController"));
@@ -82,10 +84,10 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(currentUser));
 
-                oneOf(bankValidator).isAmountValid(0);
+                oneOf(bankValidator).isAmountValid(null);
                 will(returnValue(true));
 
-                oneOf(bankService).withdraw(user, 0);
+                oneOf(bankService).withdraw(user, "5");
 
                 oneOf(siteMap).bankController();
                 will(returnValue("/bankController"));

@@ -5,7 +5,7 @@ package com.clouway.core;
  */
 public interface BankValidator {
 
-  boolean isAmountValid(double amount);
+  boolean isAmountValid(String amount);
 
   boolean isUserCorrect(User user);
 }

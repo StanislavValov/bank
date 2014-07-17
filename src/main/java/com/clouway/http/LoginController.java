@@ -1,6 +1,9 @@
 package com.clouway.http;
 
-import com.clouway.core.*;
+import com.clouway.core.Generator;
+import com.clouway.core.SessionService;
+import com.clouway.core.SiteMap;
+import com.clouway.core.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;

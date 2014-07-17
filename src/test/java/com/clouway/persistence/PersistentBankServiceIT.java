@@ -24,18 +24,18 @@ public class PersistentBankServiceIT {
         accountService = new PersistentAccountService();
         accountService.deleteUser(user);
         accountService.registerUser(user);
-        bankService.deposit(user,5);
+        bankService.deposit(user,"5");
     }
 
     @Test
     public void depositSuccessful()  {
-        bankService.deposit(user,5);
+        bankService.deposit(user,"5");
         assertThat(bankService.getAccountAmount(user), is(10.0));
     }
 
     @Test
     public void withdrawSuccessful()  {
-        bankService.withdraw(user,5);
+        bankService.withdraw(user,"5");
         assertThat(bankService.getAccountAmount(user),is(0.0));
     }
 }

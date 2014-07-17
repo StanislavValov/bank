@@ -46,7 +46,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void loginSuccessFul()  {
+    public void loginSuccessFul() {
 
         user.setUserName("Torbalan");
 
@@ -65,7 +65,7 @@ public class LoginControllerTest {
     }
 
     @Test
-    public void loginFailed()  {
+    public void loginFailed() {
 
         context.checking(new Expectations() {
             {
@@ -73,7 +73,6 @@ public class LoginControllerTest {
                 will(returnValue(false));
 
                 oneOf(idGenerator).getUniqueId(user);
-                will(returnValue("123"));
             }
         });
         assertNull(loginController.authorise(response));

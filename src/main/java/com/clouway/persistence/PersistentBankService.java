@@ -16,7 +16,7 @@ public class PersistentBankService implements BankService {
     private DB database;
 
     @Override
-    public void deposit(User user, double amount) {
+    public void deposit(User user, String amount) {
 
         try {
             mongoClient = new MongoClient();
@@ -24,7 +24,7 @@ public class PersistentBankService implements BankService {
             database.requestStart();
             accounts = database.getCollection("accounts");
 
-            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", amount));
+            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", Double.parseDouble(amount)));
             accounts.update(new BasicDBObject().append("userName", user.getUserName()), query);
 
         } catch (UnknownHostException e) {
@@ -33,7 +33,7 @@ public class PersistentBankService implements BankService {
     }
 
     @Override
-    public void withdraw(User user, double amount) {
+    public void withdraw(User user, String amount) {
 
         try {
             mongoClient = new MongoClient();
@@ -41,7 +41,7 @@ public class PersistentBankService implements BankService {
             database.requestStart();
             accounts = database.getCollection("accounts");
 
-            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", -amount));
+            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", -Double.parseDouble(amount)));
             accounts.update(new BasicDBObject().append("userName", user.getUserName()), query);
 
         } catch (UnknownHostException e) {

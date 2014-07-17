@@ -26,10 +26,6 @@ public class User {
         this.password = password;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
     public String getUserName() {
         return userName;
     }
