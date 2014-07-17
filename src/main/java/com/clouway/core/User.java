@@ -58,8 +58,4 @@ public class User {
         this.sessionId = sessionId;
     }
 
-    public void setSomeTestMethod(){
-
-    }
-
 }
