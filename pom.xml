@@ -110,6 +110,16 @@
                 <artifactId>maven-jetty-plugin</artifactId>
                 <version>6.1.9</version>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.9</version>
+                <configuration>
+                    <goals>install</goals>
+                </configuration>
+            </plugin>
+
         </plugins>
         <finalName>Task15.1</finalName>
     </build>
