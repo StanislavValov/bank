@@ -50,12 +50,13 @@ public class PersistentAccountService implements AccountService, AuthorisationSe
             database.requestStart();
             accounts = database.getCollection("accounts");
 
+
             BasicDBObject doc = new BasicDBObject()
                     .append("userName", user.getUserName())
                     .append("password", user.getPassword())
                     .append("amount", 0);
+            accounts.createIndex(new BasicDBObject("userName",1),new BasicDBObject("unique",true));
             accounts.insert(doc);
-
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
