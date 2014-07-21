@@ -17,8 +17,6 @@ public class ApplicationBootstrap extends GuiceServletContextListener {
             @Override
             protected void configureSitebricks() {
                 scan(LoginController.class.getPackage());
-                scan(BankController.class.getPackage());
-                scan(LogoutController.class.getPackage());
             }
         });
     }

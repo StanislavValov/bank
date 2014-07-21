@@ -21,34 +21,34 @@
 </head>
 <body style="background-color: antiquewhite">
 <div align="center">
-<span class="glyphicon glyphicon-user"></span>
+    <span class="glyphicon glyphicon-user"></span>
 </div>
 <div class="container" align="center" style="background-color: aliceblue">
+    <div align="right">
+        <form method="post" action="/logout">
+            <input type="submit" name="logout" class="btn btn-primary" value="Logout">
+        </form>
+    </div>
     <Form method="post" action="/bankController">
-        Amount: ${this.getUserAccountAmount()} $
+        Current Amount: ${this.getUserAccountAmount()} $
         <br>
 
         <div class="btn-group btn-group-xs">
-            <div class="col-med-10">
+            <div class="input-group">
                 <input type="text" class="form-control" placeholder="enter amount" name="account.transactionAmount">
+                <span class="input-group-addon glyphicon glyphicon-usd"></span>
             </div>
             <p></p>
 
             <div>
-                <input type="submit" name="account.deposit" class="btn btn-default btn-xs" value="Deposit" style="font-style: italic" id="deposit">
+                <input type="submit" name="account.deposit" class="btn btn-default btn-xs" value="Deposit"
+                       style="font-style: italic" id="deposit">
                 <input type="submit" name="account.withdraw" class="btn btn-default btn-xs" value="Withdraw"
                        id="withdraw" style="font-style: italic">
             </div>
         </div>
-
-
     </Form>
-
-    <form method="post" action="/logout">
-        <div class="btn-group btn-group-xs">
-            <input type="submit" name="logout" class="btn btn-default" value="Logout">
-        </div>
-    </form>
 </div>
+
 </body>
 </html>

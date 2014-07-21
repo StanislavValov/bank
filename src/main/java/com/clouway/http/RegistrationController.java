@@ -14,7 +14,7 @@ import com.google.sitebricks.http.Post;
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @At("/registration")
-@Show("/bank/RegistrationForm.html")
+@Show("/registration")
 @Singleton
 public class RegistrationController {
 
@@ -51,4 +51,3 @@ public class RegistrationController {
         this.user = user;
     }
 }
-

@@ -1,0 +1,9 @@
+.btn3d{
+    position:relative;
+    border:0;
+    border-radius:3px;
+    margin:15px 10px 0 0;
+    transition:all .09s linear;
+    box-shadow:0 0 0 1px inset, 0 0 0 2px rgba(100,255,255,0.15) inset, 6px 6px 0 0 #ccc, 6px 6px 0 1px rgba(0,0,0,0.2), 6px 6px 3px 0px rgba(0,0,0,0.3);
+    outline:medium none;
+}

@@ -6,17 +6,47 @@
 
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
+    <link rel="stylesheet" href="RegFormStyle.css">
+
     <title>BankRegistration</title>
 </head>
-<body bgcolor="#b0c4de">
+<h1 align="center">
+    <small>Registration</small>
+</h1>
+<body style="background-color: antiquewhite">
 
-<form method="post" action="/registration">
-    <p>Username: <input type="text" name="user.userName"></p>
 
-    <p>Password: <input type="password" name="user.password"></p>
-    <input type="submit" value="Register">
+<div class="container" align="center">
+    <p></p>
 
-</form>
+    <form class="col-md-12 go-right" role="form" action="/registration" method="post">
+        <div class="form-group" style="width: 50%">
+            <label for="inputUserName"></label>
+
+            <div class="input-group">
+                <input type="text" class="form-control" id="inputUserName" placeholder="Username" name="user.userName">
+                <label for="inputUserName">From 5 to 15 letters</label>
+                <span class="input-group-addon glyphicon glyphicon-user"></span>
+            </div>
+        </div>
+        <div class="form-group" style="width: 50%">
+
+            <div class="input-group">
+                <input type="password" class="form-control" id="inputPassword" placeholder="Password"
+                       name="user.password">
+                <label for="inputPassword">From 6 to 18 letters or digits</label>
+                <span class="input-group-addon glyphicon glyphicon-lock"></span>
+            </div>
+        </div>
+
+        <div class="form-group" style="width: 80%">
+            <div class="col-md-offset-1 col-md-10">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+        </div>
+    </form>
+    <p></p>
+</div>
 
 </body>
 </html>
