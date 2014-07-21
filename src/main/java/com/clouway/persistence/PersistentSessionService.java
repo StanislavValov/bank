@@ -142,6 +142,7 @@ public class PersistentSessionService implements SessionService {
                     .append("userName", user.getUserName())
                     .append("sessionId", sessionId)
                     .append("expirationTime", clockUtil.expirationDate());
+            sessions.createIndex(new BasicDBObject("sessionId",1),new BasicDBObject("unique",true));
             sessions.insert(doc);
         } catch (UnknownHostException e) {
             e.printStackTrace();
