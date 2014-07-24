@@ -14,7 +14,7 @@ import com.google.sitebricks.http.Post;
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @At("/registration")
-@Show("/registration")
+@Show("/bank/RegistrationForm.html")
 @Singleton
 public class RegistrationController {
 

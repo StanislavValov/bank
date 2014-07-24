@@ -6,15 +6,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;
 import com.google.sitebricks.Show;
-import com.google.sitebricks.http.As;
-import com.google.sitebricks.http.Get;
 import com.google.sitebricks.http.Post;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -26,12 +18,12 @@ public class BankController {
 
     private BankService bankService;
     private BankValidator validator;
-    private Provider<CurrentUser> currentUserProvider;
+    private Provider<User> currentUserProvider;
     private SiteMap siteMap;
     private Account account = new Account();
 
     @Inject
-    public BankController(BankService bankService, BankValidator validator, Provider<CurrentUser> currentUserProvider, SiteMap siteMap) {
+    public BankController(BankService bankService, BankValidator validator, Provider<User> currentUserProvider, SiteMap siteMap) {
         this.bankService = bankService;
         this.validator = validator;
         this.currentUserProvider = currentUserProvider;
@@ -41,7 +33,7 @@ public class BankController {
     @Post
     public String accountOperation() {
 
-        User user = currentUserProvider.get().getUser();
+        User user = currentUserProvider.get();
 
         if (validator.isAmountValid(account.getTransactionAmount())) {
 
@@ -62,7 +54,7 @@ public class BankController {
     }
 
     public double getUserAccountAmount() {
-        return bankService.getAccountAmount(currentUserProvider.get().getUser());
+        return bankService.getAccountAmount(currentUserProvider.get());
     }
 
     public Account getAccount() {

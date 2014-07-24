@@ -5,25 +5,13 @@ package com.clouway.core;
  */
 public interface SiteMap {
 
-  String cookieName();
-
-  String password();
-
-  String userName();
+  String sessionCookieName();
 
   String loginForm();
-
-
-  String depositLabel();
-
-  String withdrawLabel();
 
   String transactionAmountLabel();
 
   String transactionErrorLabel();
-
-
-  String userHtmlForm();
 
   String registrationForm();
 

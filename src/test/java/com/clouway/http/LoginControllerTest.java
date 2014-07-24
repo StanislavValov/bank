@@ -28,14 +28,14 @@ public class LoginControllerTest {
     AuthorisationService authorisationService = context.mock(AuthorisationService.class);
     SessionService sessionService = context.mock(SessionService.class);
     SiteMap siteMap = context.mock(SiteMap.class);
-    Generator idGenerator = context.mock(Generator.class);
+    IdGenerator idIdGenerator = context.mock(IdGenerator.class);
 
     @Before
     public void setUp() throws Exception {
         user = new User();
         siteMap = new LabelMap();
         cookie = new Cookie("sid", "someId");
-        loginController = new LoginController(authorisationService, sessionService, siteMap, idGenerator);
+        loginController = new LoginController(authorisationService, sessionService, siteMap, idIdGenerator);
         loginController.setUser(user);
         response = new FakeHttpServletResponse() {
             @Override
@@ -55,7 +55,7 @@ public class LoginControllerTest {
                 oneOf(authorisationService).isUserAuthorised(user);
                 will(returnValue(true));
 
-                oneOf(idGenerator).getUniqueId(user);
+                oneOf(idIdGenerator).generateFor(user);
                 will(returnValue("123"));
 
                 oneOf(sessionService).addUserAssociatedWithSession(user, "123");
@@ -72,7 +72,7 @@ public class LoginControllerTest {
                 oneOf(authorisationService).isUserAuthorised(user);
                 will(returnValue(false));
 
-                oneOf(idGenerator).getUniqueId(user);
+                oneOf(idIdGenerator).generateFor(user);
             }
         });
         assertNull(loginController.authorise(response));

@@ -19,7 +19,5 @@ public interface SessionService {
 
     void resetSessionLife(String sessionId);
 
-    int getSessionsCount();
-
     void addUserAssociatedWithSession(User user, String sessionId);
 }

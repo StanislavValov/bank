@@ -27,7 +27,6 @@ public class LogoutControllerTest {
   private LogoutController logoutController;
   private Cookie cookie;
   private Cookie[] cookies;
-  private CurrentUser currentUser;
   private User user;
 
   Mockery context = new JUnit4Mockery();
@@ -44,7 +43,6 @@ public class LogoutControllerTest {
     user = new User("Stanislav","123456");
     cookie = new Cookie("Stanislav", "123456");
     cookies = new Cookie[]{cookie};
-    currentUser = new CurrentUser(user);
   }
 
   @Test
@@ -56,7 +54,7 @@ public class LogoutControllerTest {
         will(returnValue(cookies));
 
         oneOf(currentUserProvider).get();
-        will(returnValue(currentUser));
+        will(returnValue(user));
 
         oneOf(sessionService).removeSession(user.getSessionId());
 

@@ -24,7 +24,6 @@ public class SecurityFilterTest {
     Mockery context = new JUnit4Mockery();
     SecurityFilter securityFilter;
     User user;
-    CurrentUser currentUser;
     Map<String, Timestamp> sessionsExpirationTime;
 
     ServletRequest request = context.mock(ServletRequest.class);
@@ -39,7 +38,6 @@ public class SecurityFilterTest {
     public void setUp() throws Exception {
         sessionsExpirationTime = new HashMap<String, Timestamp>();
         user = new User();
-        currentUser = new CurrentUser(user);
         securityFilter = new SecurityFilter(provider, sessionService, siteMap, clockUtil);
     }
 
@@ -49,7 +47,7 @@ public class SecurityFilterTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(new CurrentUser(null)));
+                will(returnValue(null));
 
                 oneOf(sessionService).getSessionsExpirationTime();
 
@@ -74,7 +72,7 @@ public class SecurityFilterTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(currentUser));
+                will(returnValue(user));
 
                 oneOf(sessionService).getSessionsExpirationTime();
                 will(returnValue(sessionsExpirationTime));
@@ -103,7 +101,7 @@ public class SecurityFilterTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(currentUser));
+                will(returnValue(user));
 
                 oneOf(sessionService).getSessionsExpirationTime();
                 will(returnValue(sessionsExpirationTime));
@@ -129,7 +127,7 @@ public class SecurityFilterTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(currentUser));
+                will(returnValue(user));
 
                 oneOf(sessionService).getSessionsExpirationTime();
                 will(returnValue(sessionsExpirationTime));

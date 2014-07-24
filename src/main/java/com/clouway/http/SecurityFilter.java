@@ -17,13 +17,13 @@ import java.util.Map;
 @Singleton
 public class SecurityFilter implements Filter {
 
-    private Provider<CurrentUser> currentUserProvider;
+    private Provider<User> currentUserProvider;
     private SessionService sessionService;
     private SiteMap siteMap;
     private ClockUtil clockUtil;
 
     @Inject
-    public SecurityFilter(Provider<CurrentUser> currentUserProvider, SessionService sessionService, SiteMap siteMap, ClockUtil clockUtil) {
+    public SecurityFilter(Provider<User> currentUserProvider, SessionService sessionService, SiteMap siteMap, ClockUtil clockUtil) {
         this.currentUserProvider = currentUserProvider;
         this.sessionService = sessionService;
         this.siteMap = siteMap;
@@ -40,7 +40,7 @@ public class SecurityFilter implements Filter {
 
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        User user = currentUserProvider.get().getUser();
+        User user = currentUserProvider.get();
         Map<String, Date> sessionsExpirationTime = sessionService.getSessionsExpirationTime();
         Date currentTime = clockUtil.currentTime();
 

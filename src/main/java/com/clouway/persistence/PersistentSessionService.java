@@ -118,20 +118,6 @@ public class PersistentSessionService implements SessionService {
     }
 
     @Override
-    public int getSessionsCount() {
-        int counter=0;
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            sessions = database.getCollection("sessions");
-            counter = (int) sessions.count();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return counter;
-    }
-
-    @Override
     public void addUserAssociatedWithSession(User user, String sessionId) {
         try {
             mongoClient = new MongoClient();

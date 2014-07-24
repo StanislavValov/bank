@@ -68,9 +68,4 @@ public class PersistentSessionServiceIT {
         sessionService.removeSession(user.getSessionId());
         assertNull(sessionService.findUserAssociatedWithSession(user.getSessionId()));
     }
-
-    @Test
-    public void getSessionsCount() {
-        assertThat(sessionService.getSessionsCount(), is(1));
-    }
 }

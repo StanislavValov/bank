@@ -19,7 +19,6 @@ public class BankControllerTest {
     Mockery context = new JUnit4Mockery();
     BankController bankController = null;
     User user;
-    CurrentUser currentUser;
     Account account;
 
     BankService bankService = context.mock(BankService.class);
@@ -31,7 +30,6 @@ public class BankControllerTest {
     public void setUp() throws Exception {
         user = new User();
         account = new Account();
-        currentUser = new CurrentUser(user);
         bankController = new BankController(bankService, bankValidator, provider, siteMap);
     }
 
@@ -41,7 +39,7 @@ public class BankControllerTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(currentUser));
+                will(returnValue(user));
 
                 oneOf(bankValidator).isAmountValid(null);
                 will(returnValue(false));
@@ -62,7 +60,7 @@ public class BankControllerTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(currentUser));
+                will(returnValue(user));
 
                 oneOf(bankValidator).isAmountValid(null);
                 will(returnValue(true));
@@ -82,7 +80,7 @@ public class BankControllerTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(currentUser));
+                will(returnValue(user));
 
                 oneOf(bankValidator).isAmountValid(null);
                 will(returnValue(true));

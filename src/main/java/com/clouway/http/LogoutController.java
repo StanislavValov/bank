@@ -21,12 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 @Singleton
 public class LogoutController {
 
-    private Provider<CurrentUser> currentUserProvider;
+    private Provider<User> currentUserProvider;
     private SessionService sessionService;
     private SiteMap siteMap;
 
     @Inject
-    public LogoutController(Provider<CurrentUser> currentUserProvider, SessionService sessionService, SiteMap siteMap) {
+    public LogoutController(Provider<User> currentUserProvider, SessionService sessionService, SiteMap siteMap) {
         this.currentUserProvider = currentUserProvider;
         this.sessionService = sessionService;
         this.siteMap = siteMap;
@@ -39,7 +39,7 @@ public class LogoutController {
 
         for (Cookie cookie : cookies) {
 
-            User currentUser = currentUserProvider.get().getUser();
+            User currentUser = currentUserProvider.get();
 
             if (currentUser.getSessionId().equalsIgnoreCase(cookie.getValue())) {
                 cookie.setMaxAge(0);

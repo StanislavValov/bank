@@ -13,16 +13,17 @@
     <title>StanBank</title>
 
     <style>
-        .btn3d{
-            position:relative;
-            border:0;
-            border-radius:3px;
-            margin:15px 10px 0 0;
-            transition:all .09s linear;
-            box-shadow: 0 0 0 2px rgba(50,200,200,0.15) inset, 6px 6px 0 0 #ccc, 6px 6px 0 1px rgba(0,0,0,0.2), 6px 6px 3px 0px rgba(0,0,0,0.3);
-            outline:medium none;
+        .btn3d {
+            position: relative;
+            border: 0;
+            border-radius: 3px;
+            margin: 15px 10px 0 0;
+            transition: all .09s linear;
+            box-shadow: 0 0 0 2px rgba(50, 200, 200, 0.15) inset, 6px 6px 0 0 #ccc, 6px 6px 0 1px rgba(0, 0, 0, 0.2), 6px 6px 3px 0px rgba(0, 0, 0, 0.3);
+            outline: medium none;
         }
-        h3{
+
+        h3 {
             font-style: italic;
 
         }
@@ -30,12 +31,15 @@
     </style>
 </head>
 <body style="background-color: antiquewhite">
-<h3 align="center">StanBank</h3>
+<h3 align="center" style="font-family: fantasy">StanBank</h3>
+<hr style="border: inset">
+
 <p></p>
 
-<div class="container-fluid">
+<div class="container-fluid" align="center">
     <div>
         <p></p>
+
         <form class="form-horizontal" role="form" action="/login" method="post">
             <div class="form-group" style="width: 50%">
                 <label for="inputUserName" class="col-md-2 control-label"></label>
@@ -58,16 +62,18 @@
 
             <div class="row" style="width: 80%">
                 <div>
-                    <div class="col-md-5 col-md-offset-1">
+                    <div class="col-md-6 col-md-offset-1">
                         <button type="submit" class="btn btn-primary btn3d" id="login">Sign in</button>
                     </div>
-                    <div class="col-md-0"><a href="/bank/RegistrationForm.html" class="btn btn-default btn3d">Registration</a></div>
+                    <div class="col-md-1 col-md-offset-1"><a href="/bank/RegistrationForm.html" class="btn btn-default btn3d">Registration</a>
+                    </div>
                 </div>
             </div>
         </form>
         <p></p>
     </div>
 </div>
+
 
 </body>
 </html>

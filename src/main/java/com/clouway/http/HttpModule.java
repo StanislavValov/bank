@@ -21,23 +21,23 @@ public class HttpModule extends ServletModule {
         bind(BankValidator.class).to(Validator.class);
         bind(SiteMap.class).to(LabelMap.class);
         bind(ClockUtil.class).to(Clock.class);
-        bind(Generator.class).to(IdGenerator.class);
+        bind(IdGenerator.class).to(SessionIdGenerator.class);
     }
 
     @Provides
     @RequestScoped
-    public CurrentUser getCurrentUser(Provider<HttpServletRequest> requestProvider, SessionService sessionService, SiteMap siteMap) {
+    public User getCurrentUser(Provider<HttpServletRequest> requestProvider, SessionService sessionService, SiteMap siteMap) {
         Cookie[] cookies = requestProvider.get().getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
 
-                if (cookie.getName().equalsIgnoreCase(siteMap.cookieName())) {
-                    User user = sessionService.findUserAssociatedWithSession(cookie.getValue());
-                    return new CurrentUser(user);
+                if (cookie.getName().equalsIgnoreCase(siteMap.sessionCookieName())) {
+                    return sessionService.findUserAssociatedWithSession(cookie.getValue());
+
                 }
             }
         }
-        return new CurrentUser(null);
+        return null;
     }
 }
