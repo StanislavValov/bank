@@ -8,11 +8,9 @@ public class User {
 
     private String userName;
     private String password;
-    private String sessionId;
 
-    public User(String userName, String sessionId) {
+    public User(String userName) {
         this.userName = userName;
-        this.sessionId = sessionId;
     }
 
     public User() {
@@ -34,10 +32,6 @@ public class User {
         return password;
     }
 
-    public String getSessionId() {
-        return sessionId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,12 +39,16 @@ public class User {
 
         User user = (User) o;
 
-        if (password != null && user.password != null) {
-            if (!password.equals(user.password)) return false;
-        }
-        if (sessionId != null && user.sessionId != null) {
-            if (!sessionId.equals(user.sessionId)) return false;
-        }
-        return userName.equals(user.userName);
+        if (!password.equals(user.password)) return false;
+        if (!userName.equals(user.userName)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userName.hashCode();
+        result = 31 * result + password.hashCode();
+        return result;
     }
 }

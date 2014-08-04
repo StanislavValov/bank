@@ -1,35 +1,27 @@
 package com.clouway.persistence;
 
-import com.clouway.core.ClockUtil;
+import com.clouway.core.CalendarUtil;
+import com.clouway.core.Session;
 import com.clouway.core.SessionService;
 import com.clouway.core.User;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.common.base.Optional;
 import com.mongodb.*;
 
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hisazzul@gmail.com on 7/11/14.
  */
-@Singleton
+
 public class PersistentSessionService implements SessionService {
 
     MongoClient mongoClient;
     DBCollection sessions;
-    ClockUtil clockUtil;
     DB database;
 
-    @Inject
-    public PersistentSessionService(ClockUtil clockUtil) {
-        this.clockUtil = clockUtil;
-    }
-
     @Override
-    public void removeSession(String sessionId) {
+    public void remove(String sessionId) {
 
         try {
             mongoClient = new MongoClient();
@@ -46,71 +38,52 @@ public class PersistentSessionService implements SessionService {
     }
 
     @Override
-    public User findUserAssociatedWithSession(String sessionId) {
+    public Session get(String sessionId) {
+
+        String userName = null;
+        String id = null;
+        Date expirationTime = null;
 
         try {
             mongoClient = new MongoClient();
             database = mongoClient.getDB("bank");
             sessions = database.getCollection("sessions");
 
-            BasicDBObject query = new BasicDBObject();
-            query.append("sessionId", sessionId);
+            BasicDBObject query = new BasicDBObject("sessionId", sessionId);
 
             BasicDBObject fields = new BasicDBObject();
             fields.put("userName", 1);
             fields.put("sessionId", 2);
+            fields.put("expirationTime", 3);
 
-            DBCursor cursor = sessions.find(query, fields);
+            DBObject session = sessions.findOne(query, fields);
 
-            while (cursor.hasNext()) {
-                BasicDBObject dbObject = (BasicDBObject) cursor.next();
-                return new User(dbObject.getString("userName"), dbObject.getString("sessionId"));
-            }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public Map<String, Date> getSessionsExpirationTime() {
-
-        Map<String, Date> result = new HashMap<String, Date>();
-
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            sessions = database.getCollection("sessions");
-
-            BasicDBObject query = new BasicDBObject();
-
-            BasicDBObject fields = new BasicDBObject();
-            fields.put("sessionId", 1);
-            fields.put("expirationTime", 2);
-
-            DBCursor cursor = sessions.find(query, fields);
-
-            while (cursor.hasNext()) {
-                BasicDBObject dbObject = (BasicDBObject) cursor.next();
-                result.put((String) dbObject.get("sessionId"), (Date) dbObject.get("expirationTime"));
-            }
+            userName = String.valueOf(session.get("userName"));
+            id = String.valueOf(session.get("sessionId"));
+            expirationTime = (Date) session.get("expirationTime");
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        return result;
+        Optional<Session> optional = Optional.of(new Session(userName, id, expirationTime));
+        return optional.get();
     }
 
     @Override
-    public void resetSessionLife(String sessionId) {
+    public void reset(String sessionId) {
         try {
             mongoClient = new MongoClient();
             database = mongoClient.getDB("bank");
             sessions = database.getCollection("sessions");
 
             BasicDBObject query = new BasicDBObject()
-                    .append("$set", new BasicDBObject().append("expirationTime", clockUtil.expirationDate()));
-            sessions.update(new BasicDBObject().append("sessionId", sessionId), query);
+                    .append("$set", new BasicDBObject()
+                            .append("expirationTime", CalendarUtil.sessionExpirationTime()));
+
+            sessions.createIndex(new BasicDBObject("sessionId", 1),
+                    new BasicDBObject("expireAfterSeconds", CalendarUtil.sessionExpirationTime()));
+
+            sessions.update(new BasicDBObject("sessionId", sessionId), query);
 
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -118,7 +91,8 @@ public class PersistentSessionService implements SessionService {
     }
 
     @Override
-    public void addUserAssociatedWithSession(User user, String sessionId) {
+    public void addUser(User user, String sessionId) {
+
         try {
             mongoClient = new MongoClient();
             database = mongoClient.getDB("bank");
@@ -127,15 +101,17 @@ public class PersistentSessionService implements SessionService {
             BasicDBObject doc = new BasicDBObject()
                     .append("userName", user.getUserName())
                     .append("sessionId", sessionId)
-                    .append("expirationTime", clockUtil.expirationDate());
-            sessions.createIndex(new BasicDBObject("sessionId",1),new BasicDBObject("unique",true));
+                    .append("expirationTime", CalendarUtil.sessionExpirationTime());
+
+            sessions.createIndex(new BasicDBObject("expirationTime", 1), new BasicDBObject("expireAfterSeconds", 0));
             sessions.insert(doc);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
     }
 
-    public void cleanSessionsTable(){
+    public void cleanSessionsTable() {
+
         try {
             mongoClient = new MongoClient();
             database = mongoClient.getDB("bank");

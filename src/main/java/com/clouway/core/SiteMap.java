@@ -9,8 +9,6 @@ public interface SiteMap {
 
   String loginForm();
 
-  String transactionAmountLabel();
-
   String transactionErrorLabel();
 
   String registrationForm();

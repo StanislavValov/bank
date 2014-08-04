@@ -1,18 +1,14 @@
 package com.clouway.http;
 
-import com.clouway.core.AccountService;
-import com.clouway.core.BankValidator;
-import com.clouway.core.LabelMap;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
+import com.clouway.core.UserRepository;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -22,19 +18,21 @@ import static org.hamcrest.core.Is.is;
  */
 public class RegistrationControllerTest {
 
-    Mockery context = new JUnit4Mockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
+
     RegistrationController registrationController;
     User user;
 
-    AccountService accountService = context.mock(AccountService.class);
-    BankValidator bankValidator = context.mock(BankValidator.class);
+    UserRepository userRepository = context.mock(UserRepository.class);
+    UserValidator userValidator = context.mock(UserValidator.class);
     SiteMap siteMap = context.mock(SiteMap.class);
 
     @Before
     public void setUp() throws Exception {
-        user = new User("Stanislav","123456");
+        user = new User("Stanislav");
         user.setPassword("123456");
-        registrationController = new RegistrationController(accountService, bankValidator, siteMap);
+        registrationController = new RegistrationController(userRepository, userValidator, siteMap);
         registrationController.setUser(user);
     }
 
@@ -43,13 +41,13 @@ public class RegistrationControllerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(bankValidator).isUserCorrect(user);
+                oneOf(userValidator).userIsCorrect(user);
                 will(returnValue(true));
 
-                oneOf(accountService).userExists(user);
+                oneOf(userRepository).exists(user.getUserName());
                 will(returnValue(false));
 
-                oneOf(accountService).registerUser(user);
+                oneOf(userRepository).register(user);
 
                 oneOf(siteMap).loginForm();
                 will(returnValue("/bank/Login.html"));
@@ -63,7 +61,7 @@ public class RegistrationControllerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(bankValidator).isUserCorrect(user);
+                oneOf(userValidator).userIsCorrect(user);
                 will(returnValue(false));
 
                 oneOf(siteMap).registrationForm();
@@ -78,10 +76,10 @@ public class RegistrationControllerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(bankValidator).isUserCorrect(user);
+                oneOf(userValidator).userIsCorrect(user);
                 will(returnValue(true));
 
-                oneOf(accountService).userExists(user);
+                oneOf(userRepository).exists(user.getUserName());
                 will(returnValue(true));
 
                 oneOf(siteMap).registrationForm();

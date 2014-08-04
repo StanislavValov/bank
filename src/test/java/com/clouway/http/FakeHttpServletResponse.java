@@ -1,4 +1,4 @@
-package com.clouway.persistence;
+package com.clouway.http;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;

@@ -5,8 +5,12 @@ import com.google.inject.Provider;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -16,9 +20,12 @@ import static org.hamcrest.core.Is.is;
  */
 public class BankControllerTest {
 
-    Mockery context = new JUnit4Mockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
+
     BankController bankController = null;
     User user;
+    Session session;
     Account account;
 
     BankService bankService = context.mock(BankService.class);
@@ -28,8 +35,10 @@ public class BankControllerTest {
 
     @Before
     public void setUp() throws Exception {
+        session = new Session("Stan","123",new Date());
         user = new User();
         account = new Account();
+        account.setDeposit("5");
         bankController = new BankController(bankService, bankValidator, provider, siteMap);
     }
 
@@ -41,11 +50,8 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(bankValidator).isAmountValid(null);
+                oneOf(bankValidator).amountIsValid(null);
                 will(returnValue(false));
-
-                oneOf(siteMap).transactionAmountLabel();
-                will(returnValue("amount"));
 
                 oneOf(siteMap).transactionErrorLabel();
                 will(returnValue("/bank/TransactionError.html"));
@@ -62,10 +68,11 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(bankValidator).isAmountValid(null);
+                oneOf(bankValidator).amountIsValid(null);
                 will(returnValue(true));
 
-                oneOf(bankService).deposit(user, "5");
+                oneOf(bankService).deposit(session, "5");
+
 
                 oneOf(siteMap).bankController();
                 will(returnValue("/bankController"));
@@ -82,10 +89,10 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(bankValidator).isAmountValid(null);
+                oneOf(bankValidator).amountIsValid(null);
                 will(returnValue(true));
 
-                oneOf(bankService).withdraw(user, "5");
+                oneOf(bankService).withdraw(session, "5");
 
                 oneOf(siteMap).bankController();
                 will(returnValue("/bankController"));

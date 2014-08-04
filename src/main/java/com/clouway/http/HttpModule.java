@@ -18,23 +18,22 @@ public class HttpModule extends ServletModule {
     protected void configureServlets() {
         filter("/bankController").through(SecurityFilter.class);
 
-        bind(BankValidator.class).to(Validator.class);
+        bind(BankValidator.class).to(RegexBankValidator.class);
         bind(SiteMap.class).to(LabelMap.class);
-        bind(ClockUtil.class).to(Clock.class);
         bind(IdGenerator.class).to(SessionIdGenerator.class);
+        bind(UserValidator.class).to(RegexUserValidator.class);
     }
 
     @Provides
     @RequestScoped
-    public User getCurrentUser(Provider<HttpServletRequest> requestProvider, SessionService sessionService, SiteMap siteMap) {
+    public Session getCurrentSession(Provider<HttpServletRequest> requestProvider, SessionService sessionService, SiteMap siteMap) {
         Cookie[] cookies = requestProvider.get().getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
 
-                if (cookie.getName().equalsIgnoreCase(siteMap.sessionCookieName())) {
-                    return sessionService.findUserAssociatedWithSession(cookie.getValue());
-
+                if (cookie.getName().equals(siteMap.sessionCookieName())) {
+                    return sessionService.get(cookie.getValue());
                 }
             }
         }

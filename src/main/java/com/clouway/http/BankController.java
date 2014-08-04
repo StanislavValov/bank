@@ -18,33 +18,33 @@ public class BankController {
 
     private BankService bankService;
     private BankValidator validator;
-    private Provider<User> currentUserProvider;
+    private Provider<Session> currentSessionProvider;
     private SiteMap siteMap;
     private Account account = new Account();
 
     @Inject
-    public BankController(BankService bankService, BankValidator validator, Provider<User> currentUserProvider, SiteMap siteMap) {
+    public BankController(BankService bankService, BankValidator validator, Provider<Session> currentSessionProvider, SiteMap siteMap) {
         this.bankService = bankService;
         this.validator = validator;
-        this.currentUserProvider = currentUserProvider;
+        this.currentSessionProvider = currentSessionProvider;
         this.siteMap = siteMap;
     }
 
     @Post
     public String accountOperation() {
 
-        User user = currentUserProvider.get();
+        Session currentSession= currentSessionProvider.get();
 
-        if (validator.isAmountValid(account.getTransactionAmount())) {
+        if (validator.amountIsValid(account.getTransactionAmount())) {
 
             if (account.getDeposit() != null) {
                 account.setDeposit(null);
-                bankService.deposit(user, account.getTransactionAmount());
+                bankService.deposit(currentSession, account.getTransactionAmount());
             }
 
             if (account.getWithdraw() != null) {
                 account.setWithdraw(null);
-                bankService.withdraw(user, account.getTransactionAmount());
+                bankService.withdraw(currentSession, account.getTransactionAmount());
             }
 
         } else {
@@ -54,7 +54,7 @@ public class BankController {
     }
 
     public double getUserAccountAmount() {
-        return bankService.getAccountAmount(currentUserProvider.get());
+        return bankService.getAccountAmount(currentSessionProvider.get());
     }
 
     public Account getAccount() {

@@ -1,10 +1,7 @@
 package com.clouway.http;
 
 
-import com.clouway.core.SessionService;
-import com.clouway.core.IdGenerator;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;
@@ -40,15 +37,14 @@ public class LoginController {
     @Post
     public String authorise(HttpServletResponse response) {
 
-
-        if (!authorisationService.isUserAuthorised(user)) {
+        if (!authorisationService.isAuthorised(user)) {
             return null;
         }
 
         String sessionId = idGenerator.generateFor(user);
 
         response.addCookie(new Cookie(siteMap.sessionCookieName(), sessionId));
-        sessionService.addUserAssociatedWithSession(user, sessionId);
+        sessionService.addUser(user, sessionId);
         return siteMap.bankController();
     }
 

@@ -1,69 +1,55 @@
 package com.clouway.http;
 
-import com.clouway.core.*;
+import com.clouway.core.Session;
 import com.clouway.core.SessionService;
+import com.clouway.core.SiteMap;
+import com.clouway.core.User;
 import com.google.inject.Provider;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jmock.internal.CaptureControl;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import java.util.Date;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 public class LogoutControllerTest {
 
-  private LogoutController logoutController;
-  private Cookie cookie;
-  private Cookie[] cookies;
-  private User user;
+    private LogoutController logoutController;
+    private Session session;
 
-  Mockery context = new JUnit4Mockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
 
-  HttpServletRequest request = context.mock(HttpServletRequest.class);
-  HttpServletResponse response = context.mock(HttpServletResponse.class);
-  SessionService sessionService = context.mock(SessionService.class);
-  Provider currentUserProvider = context.mock(Provider.class);
-  SiteMap siteMap = context.mock(SiteMap.class);
+    SessionService sessionService = context.mock(SessionService.class);
+    Provider currentUserProvider = context.mock(Provider.class);
+    SiteMap siteMap = context.mock(SiteMap.class);
 
-  @Before
-  public void setUp() throws Exception {
-    logoutController = new LogoutController(currentUserProvider, sessionService, siteMap);
-    user = new User("Stanislav","123456");
-    cookie = new Cookie("Stanislav", "123456");
-    cookies = new Cookie[]{cookie};
-  }
+    @Before
+    public void setUp() throws Exception {
+        logoutController = new LogoutController(currentUserProvider, sessionService, siteMap);
+        session = new Session("Stanislav","123",new Date());
+    }
 
-  @Test
-  public void successfulLogout() throws IOException, ServletException {
+    @Test
+    public void successfulLogout() throws IOException, ServletException {
 
-    context.checking(new Expectations() {
-      {
-        oneOf(request).getCookies();
-        will(returnValue(cookies));
+        context.checking(new Expectations() {
+            {
+                oneOf(currentUserProvider).get();
+                will(returnValue(session));
 
-        oneOf(currentUserProvider).get();
-        will(returnValue(user));
+                oneOf(sessionService).remove(session.getId());
 
-        oneOf(sessionService).removeSession(user.getSessionId());
-
-        oneOf(response).addCookie(cookie);
-
-        oneOf(siteMap).loginForm();
-        will(returnValue("/bank/Login.html"));
-      }
-    });
-      logoutController.logout(request,response);
-  }
+                oneOf(siteMap).loginForm();
+                will(returnValue("/bank/Login.html"));
+            }
+        });
+        logoutController.logout();
+    }
 }

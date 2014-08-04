@@ -8,8 +8,8 @@ import com.google.inject.Singleton;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -17,17 +17,15 @@ import java.util.Map;
 @Singleton
 public class SecurityFilter implements Filter {
 
-    private Provider<User> currentUserProvider;
+    private Provider<Session> currentSessionProvider;
     private SessionService sessionService;
     private SiteMap siteMap;
-    private ClockUtil clockUtil;
 
     @Inject
-    public SecurityFilter(Provider<User> currentUserProvider, SessionService sessionService, SiteMap siteMap, ClockUtil clockUtil) {
-        this.currentUserProvider = currentUserProvider;
+    public SecurityFilter(Provider<Session> currentSessionProvider, SessionService sessionService, SiteMap siteMap) {
+        this.currentSessionProvider = currentSessionProvider;
         this.sessionService = sessionService;
         this.siteMap = siteMap;
-        this.clockUtil = clockUtil;
     }
 
     @Override
@@ -40,29 +38,22 @@ public class SecurityFilter implements Filter {
 
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        User user = currentUserProvider.get();
-        Map<String, Date> sessionsExpirationTime = sessionService.getSessionsExpirationTime();
-        Date currentTime = clockUtil.currentTime();
+        Session currentSession = currentSessionProvider.get();
+        Date currentTime = new Timestamp(System.currentTimeMillis());
 
-        if (user != null) {
+        if (currentSession != null) {
 
-            if (sessionsExpirationTime.get(user.getSessionId()).before(currentTime)) {
+            if (currentSession.getExpirationDate().before(currentTime)) {
 
                 response.sendRedirect(siteMap.logoutController());
 
             } else {
-                sessionService.resetSessionLife(user.getSessionId());
+                sessionService.reset(currentSession.getId());
                 filterChain.doFilter(servletRequest, servletResponse);
             }
 
         } else {
             response.sendRedirect(siteMap.loginForm());
-        }
-
-        for (String sessionId : sessionsExpirationTime.keySet()) {
-            if (sessionsExpirationTime.get(sessionId).before(currentTime)) {
-                sessionService.removeSession(sessionId);
-            }
         }
     }
 

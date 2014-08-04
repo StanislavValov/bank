@@ -1,11 +1,10 @@
 package com.clouway.http;
 
 import com.clouway.core.*;
-import com.clouway.persistence.FakeHttpServletResponse;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import javax.servlet.http.Cookie;
@@ -19,7 +18,9 @@ import static org.junit.Assert.assertNull;
  */
 public class LoginControllerTest {
 
-    Mockery context = new JUnit4Mockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
+
     LoginController loginController;
     User user;
     Cookie cookie;
@@ -52,13 +53,13 @@ public class LoginControllerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(authorisationService).isUserAuthorised(user);
+                oneOf(authorisationService).isAuthorised(user);
                 will(returnValue(true));
 
                 oneOf(idIdGenerator).generateFor(user);
                 will(returnValue("123"));
 
-                oneOf(sessionService).addUserAssociatedWithSession(user, "123");
+                oneOf(sessionService).addUser(user, "123");
             }
         });
         assertThat(loginController.authorise(response), is("/bankController"));
@@ -69,10 +70,8 @@ public class LoginControllerTest {
 
         context.checking(new Expectations() {
             {
-                oneOf(authorisationService).isUserAuthorised(user);
+                oneOf(authorisationService).isAuthorised(user);
                 will(returnValue(false));
-
-                oneOf(idIdGenerator).generateFor(user);
             }
         });
         assertNull(loginController.authorise(response));

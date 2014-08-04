@@ -11,13 +11,11 @@ import java.util.Map;
  */
 public interface SessionService {
 
-    void removeSession(String sessionId);
+    void remove(String sessionId);
 
-    User findUserAssociatedWithSession(String sessionId);
+    Session get(String sessionId);
 
-    Map<String, Date> getSessionsExpirationTime();
+    void reset(String sessionId);
 
-    void resetSessionLife(String sessionId);
-
-    void addUserAssociatedWithSession(User user, String sessionId);
+    void addUser(User user, String sessionId);
 }

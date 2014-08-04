@@ -13,11 +13,11 @@ public class UserEqualityTest {
 
   @Test
   public void usersAreEqual() {
-    assertThat(new User("Stan","1122"), is((new User("Stan","1122"))));
+    assertThat(new User("Stan"), is((new User("Stan"))));
   }
 
   @Test
   public void usersAreNotEqual() {
-    assertThat(new User("Stan","1122"), is(not(new User("Torbalan","1122"))));
+    assertThat(new User("Stan"), is(not(new User("Torbalan"))));
   }
 }

@@ -1,6 +1,7 @@
-package com.clouway.http;
+package com.clouway.core;
 
 import com.clouway.core.User;
+import com.google.inject.Singleton;
 
 import javax.servlet.http.Cookie;
 
@@ -9,5 +10,5 @@ import javax.servlet.http.Cookie;
  */
 public interface AuthorisationService {
 
-  boolean isUserAuthorised(User user);
+  boolean isAuthorised(User user);
 }

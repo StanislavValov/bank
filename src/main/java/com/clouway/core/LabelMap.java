@@ -17,11 +17,6 @@ public class LabelMap implements SiteMap {
     }
 
     @Override
-    public String transactionAmountLabel() {
-        return "amount";
-    }
-
-    @Override
     public String transactionErrorLabel() {
         return "/bank/TransactionError.html";
     }

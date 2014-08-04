@@ -9,23 +9,24 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
-public class ValidatorTest {
+public class RegexBankValidatorTest {
 
-    Validator validator;
+    RegexBankValidator regexBankValidator;
+    RegexUserValidator regexUserValidator;
 
     @Before
     public void setUp() throws Exception {
-        validator = new Validator();
+        regexBankValidator = new RegexBankValidator();
     }
 
     @Test
     public void correctAmount() {
-        assertThat(validator.isAmountValid("5.12"), is(true));
+        assertThat(regexBankValidator.amountIsValid("5.12"), is(true));
     }
 
     @Test
     public void incorrectAmount() {
-        assertThat(validator.isAmountValid("5.555"), is(false));
+        assertThat(regexBankValidator.amountIsValid("5.555"), is(false));
     }
 
     @Test
@@ -33,7 +34,7 @@ public class ValidatorTest {
         User user = new User();
         user.setUserName("Stanislav");
         user.setPassword("123456");
-        assertThat(validator.isUserCorrect(user), is(true));
+        assertThat(regexUserValidator.userIsCorrect(user), is(true));
     }
 
     @Test
@@ -41,7 +42,7 @@ public class ValidatorTest {
         User user = new User();
         user.setUserName("Stanislav");
         user.setPassword("112");
-        assertThat(validator.isUserCorrect(user), is(false));
+        assertThat(regexUserValidator.userIsCorrect(user), is(false));
     }
 
     @Test
@@ -49,7 +50,7 @@ public class ValidatorTest {
         User user = new User();
         user.setUserName("Stanislav");
         user.setPassword("12345678912323123123");
-        assertThat(validator.isUserCorrect(user), is(false));
+        assertThat(regexUserValidator.userIsCorrect(user), is(false));
     }
 
     @Test
@@ -57,7 +58,7 @@ public class ValidatorTest {
         User user = new User();
         user.setUserName("S");
         user.setPassword("123456");
-        assertThat(validator.isUserCorrect(user), is(false));
+        assertThat(regexUserValidator.userIsCorrect(user), is(false));
     }
 
     @Test
@@ -65,6 +66,6 @@ public class ValidatorTest {
         User user = new User();
         user.setUserName("StanislavValentinovValov");
         user.setPassword("123456");
-        assertThat(validator.isUserCorrect(user), is(false));
+        assertThat(regexUserValidator.userIsCorrect(user), is(false));
     }
 }

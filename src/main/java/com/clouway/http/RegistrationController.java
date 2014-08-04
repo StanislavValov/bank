@@ -1,9 +1,6 @@
 package com.clouway.http;
 
-import com.clouway.core.AccountService;
-import com.clouway.core.BankValidator;
-import com.clouway.core.SiteMap;
-import com.clouway.core.User;
+import com.clouway.core.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;
@@ -18,14 +15,14 @@ import com.google.sitebricks.http.Post;
 @Singleton
 public class RegistrationController {
 
-    private AccountService accountService;
-    private BankValidator validator;
+    private UserRepository userRepository;
+    private UserValidator validator;
     private SiteMap siteMap;
     private User user = new User();
 
     @Inject
-    public RegistrationController(AccountService accountService, BankValidator validator, SiteMap siteMap) {
-        this.accountService = accountService;
+    public RegistrationController(UserRepository userRepository, UserValidator validator, SiteMap siteMap) {
+        this.userRepository = userRepository;
         this.validator = validator;
         this.siteMap = siteMap;
     }
@@ -33,10 +30,10 @@ public class RegistrationController {
     @Post
     public String register() {
 
-        if (validator.isUserCorrect(user)) {
+        if (validator.userIsCorrect(user)) {
 
-            if (!accountService.userExists(user)) {
-                accountService.registerUser(user);
+            if (!userRepository.exists(user.getUserName())) {
+                userRepository.register(user);
                 return siteMap.loginForm();
             }
         }

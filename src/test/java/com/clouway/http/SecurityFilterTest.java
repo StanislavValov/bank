@@ -4,15 +4,16 @@ import com.clouway.core.*;
 import com.clouway.core.SessionService;
 import com.google.inject.Provider;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +22,12 @@ import java.util.Map;
  */
 public class SecurityFilterTest {
 
-    Mockery context = new JUnit4Mockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
+
     SecurityFilter securityFilter;
     User user;
+    Session session;
     Map<String, Timestamp> sessionsExpirationTime;
 
     ServletRequest request = context.mock(ServletRequest.class);
@@ -31,14 +35,14 @@ public class SecurityFilterTest {
     FilterChain filterChain = context.mock(FilterChain.class);
     SessionService sessionService = context.mock(SessionService.class);
     Provider provider = context.mock(Provider.class);
-    ClockUtil clockUtil = context.mock(ClockUtil.class);
     SiteMap siteMap = context.mock(SiteMap.class);
 
     @Before
     public void setUp() throws Exception {
         sessionsExpirationTime = new HashMap<String, Timestamp>();
         user = new User();
-        securityFilter = new SecurityFilter(provider, sessionService, siteMap, clockUtil);
+        session = new Session("Stan","123",new Date());
+        securityFilter = new SecurityFilter(provider, sessionService, siteMap);
     }
 
     @Test
@@ -49,9 +53,7 @@ public class SecurityFilterTest {
                 oneOf(provider).get();
                 will(returnValue(null));
 
-                oneOf(sessionService).getSessionsExpirationTime();
-
-                oneOf(clockUtil).currentTime();
+                oneOf(sessionService).get("123");
 
                 oneOf(siteMap).loginForm();
                 will(returnValue("/bank/Login.html"));
@@ -67,20 +69,17 @@ public class SecurityFilterTest {
 
         final Timestamp expirationTime = new Timestamp(System.currentTimeMillis() - 5 * 60 * 1000);
         final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        sessionsExpirationTime.put(user.getSessionId(), expirationTime);
+        sessionsExpirationTime.put(session.getId(), expirationTime);
 
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(sessionService).getSessionsExpirationTime();
+                oneOf(sessionService).get("123");
                 will(returnValue(sessionsExpirationTime));
 
-                oneOf(clockUtil).currentTime();
-                will(returnValue(currentTime));
-
-                oneOf(sessionService).removeSession(user.getSessionId());
+                oneOf(sessionService).remove(session.getId());
 
                 oneOf(siteMap).logoutController();
                 will(returnValue("/logout"));
@@ -96,20 +95,17 @@ public class SecurityFilterTest {
 
         final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000);
         final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        sessionsExpirationTime.put(user.getSessionId(), expirationTIme);
+        sessionsExpirationTime.put(session.getId(), expirationTIme);
 
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(sessionService).getSessionsExpirationTime();
+                oneOf(sessionService).get("123");
                 will(returnValue(sessionsExpirationTime));
 
-                oneOf(clockUtil).currentTime();
-                will(returnValue(currentTime));
-
-                oneOf(sessionService).resetSessionLife(user.getSessionId());
+                oneOf(sessionService).reset(session.getId());
 
                 oneOf(filterChain).doFilter(request, response);
             }
@@ -122,27 +118,24 @@ public class SecurityFilterTest {
 
         final Timestamp expirationTIme = new Timestamp(System.currentTimeMillis() - 1);
         final Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        sessionsExpirationTime.put(user.getSessionId(), expirationTIme);
+        sessionsExpirationTime.put(session.getId(), expirationTIme);
 
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(sessionService).getSessionsExpirationTime();
+                oneOf(sessionService).get("123");
                 will(returnValue(sessionsExpirationTime));
 
-                oneOf(clockUtil).currentTime();
-                will(returnValue(currentTime));
-
-                oneOf(sessionService).resetSessionLife(null);
+                oneOf(sessionService).reset(null);
 
                 oneOf(siteMap).logoutController();
                 will(returnValue("/logout"));
 
                 oneOf(filterChain).doFilter(request,response);
 
-                oneOf(sessionService).removeSession(user.getSessionId());
+                oneOf(sessionService).remove(session.getId());
             }
         });
         securityFilter.doFilter(request, response, filterChain);
