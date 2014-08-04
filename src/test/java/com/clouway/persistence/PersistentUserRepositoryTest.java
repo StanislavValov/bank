@@ -10,7 +10,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Created by hisazzul@gmail.com on 7/15/14.
  */
-public class PersistentAccountServiceTest {
+public class PersistentUserRepositoryTest {
 
     PersistentUserRepository accountService;
     User user;

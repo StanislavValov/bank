@@ -5,5 +5,5 @@ package com.clouway.core;
  */
 public interface BankValidator {
 
-  boolean amountIsValid(String amount);
+  boolean transactionIsValid(String amount);
 }

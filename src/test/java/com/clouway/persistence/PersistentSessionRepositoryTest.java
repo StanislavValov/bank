@@ -15,19 +15,21 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by hisazzul@gmail.com on 7/16/14.
  */
-public class PersistentSessionServiceTest {
+public class PersistentSessionRepositoryTest {
 
-    PersistentSessionService sessionService;
+    PersistentSessionRepository sessionService;
     PersistentUserRepository accountService;
     User user;
     Session session;
+
+
 
     @Before
     public void setUp() throws Exception {
         user = new User("Thor");
         session = new Session("Thor","someId",new Date());
 
-        sessionService = new PersistentSessionService();
+//        sessionService = new PersistentSessionRepository();
         accountService = new PersistentUserRepository();
 
         sessionService.cleanSessionsTable();

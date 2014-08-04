@@ -3,8 +3,6 @@ package com.clouway.http;
 import com.clouway.core.*;
 import com.google.inject.Provider;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +48,7 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(bankValidator).amountIsValid(null);
+                oneOf(bankValidator).transactionIsValid(null);
                 will(returnValue(false));
 
                 oneOf(siteMap).transactionErrorLabel();
@@ -68,7 +66,7 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(bankValidator).amountIsValid(null);
+                oneOf(bankValidator).transactionIsValid(null);
                 will(returnValue(true));
 
                 oneOf(bankService).deposit(session, "5");
@@ -89,7 +87,7 @@ public class BankControllerTest {
                 oneOf(provider).get();
                 will(returnValue(user));
 
-                oneOf(bankValidator).amountIsValid(null);
+                oneOf(bankValidator).transactionIsValid(null);
                 will(returnValue(true));
 
                 oneOf(bankService).withdraw(session, "5");

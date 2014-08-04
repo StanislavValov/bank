@@ -3,6 +3,7 @@ package com.clouway.persistence;
 import com.clouway.core.BankService;
 import com.clouway.core.Session;
 import com.clouway.core.User;
+import com.clouway.core.UserNotExistException;
 import com.mongodb.*;
 
 import java.net.UnknownHostException;
@@ -67,6 +68,6 @@ public class PersistentBankService implements BankService {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        return 0;
+        throw new UserNotExistException();
     }
 }

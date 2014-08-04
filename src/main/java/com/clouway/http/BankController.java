@@ -35,7 +35,7 @@ public class BankController {
 
         Session currentSession= currentSessionProvider.get();
 
-        if (validator.amountIsValid(account.getTransactionAmount())) {
+        if (validator.transactionIsValid(account.getTransactionAmount())) {
 
             if (account.getDeposit() != null) {
                 account.setDeposit(null);

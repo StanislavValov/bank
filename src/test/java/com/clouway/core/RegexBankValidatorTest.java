@@ -21,12 +21,12 @@ public class RegexBankValidatorTest {
 
     @Test
     public void correctAmount() {
-        assertThat(regexBankValidator.amountIsValid("5.12"), is(true));
+        assertThat(regexBankValidator.transactionIsValid("5.12"), is(true));
     }
 
     @Test
     public void incorrectAmount() {
-        assertThat(regexBankValidator.amountIsValid("5.555"), is(false));
+        assertThat(regexBankValidator.transactionIsValid("5.555"), is(false));
     }
 
     @Test
