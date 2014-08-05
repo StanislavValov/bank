@@ -29,9 +29,9 @@
             <input type="submit" name="logout" class="btn btn-primary" value="Logout">
         </form>
     </div>
+    Current Amount: ${getUserAccountAmount()} $
     <Form method="post" action="/bankController">
-        Current Amount: ${getUserAccountAmount()} $
-        <br>
+        <p></p>
 
         <div class="btn-group btn-group-xs">
             <div class="input-group">
@@ -43,6 +43,7 @@
             <div>
                 <input type="submit" name="account.deposit" class="btn btn-default btn-xs" value="Deposit"
                        style="font-style: italic" id="deposit">
+
                 <input type="submit" name="account.withdraw" class="btn btn-default btn-xs" value="Withdraw"
                        id="withdraw" style="font-style: italic">
             </div>

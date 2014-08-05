@@ -1,6 +1,5 @@
 package com.clouway.http;
 
-
 import com.clouway.core.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,16 +19,16 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController {
 
     private AuthorisationService authorisationService;
-    private SessionService sessionService;
+    private SessionRepository sessionRepository;
     private SiteMap siteMap;
     private IdGenerator idGenerator;
     private User user = new User();
 
 
     @Inject
-    public LoginController(AuthorisationService authorisationService, SessionService sessionService, SiteMap siteMap, IdGenerator idGenerator) {
+    public LoginController(AuthorisationService authorisationService, SessionRepository sessionRepository, SiteMap siteMap, IdGenerator idGenerator) {
         this.authorisationService = authorisationService;
-        this.sessionService = sessionService;
+        this.sessionRepository = sessionRepository;
         this.siteMap = siteMap;
         this.idGenerator = idGenerator;
     }
@@ -38,13 +37,13 @@ public class LoginController {
     public String authorise(HttpServletResponse response) {
 
         if (!authorisationService.isAuthorised(user)) {
-            return null;
+            return siteMap.authenticationError();
         }
 
         String sessionId = idGenerator.generateFor(user);
 
         response.addCookie(new Cookie(siteMap.sessionCookieName(), sessionId));
-        sessionService.addUser(user, sessionId);
+        sessionRepository.addUser(user, sessionId);
         return siteMap.bankController();
     }
 

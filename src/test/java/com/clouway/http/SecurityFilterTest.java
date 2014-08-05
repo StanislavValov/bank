@@ -1,7 +1,7 @@
 package com.clouway.http;
 
 import com.clouway.core.*;
-import com.clouway.core.SessionService;
+import com.clouway.core.SessionRepository;
 import com.google.inject.Provider;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -12,10 +12,7 @@ import org.junit.Test;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -33,14 +30,14 @@ public class SecurityFilterTest {
     ServletRequest request = context.mock(ServletRequest.class);
     HttpServletResponse response = context.mock(HttpServletResponse.class);
     FilterChain filterChain = context.mock(FilterChain.class);
-    SessionService sessionService = context.mock(SessionService.class);
+    SessionRepository sessionRepository = context.mock(SessionRepository.class);
     Provider provider = context.mock(Provider.class);
     SiteMap siteMap = context.mock(SiteMap.class);
 
     @Before
     public void setUp() throws Exception {
         user = new User("Stan");
-        securityFilter = new SecurityFilter(provider, sessionService, siteMap);
+        securityFilter = new SecurityFilter(provider, sessionRepository, siteMap);
     }
 
     @Test
@@ -90,7 +87,7 @@ public class SecurityFilterTest {
                 oneOf(provider).get();
                 will(returnValue(session));
 
-                oneOf(sessionService).reset(session.getId());
+                oneOf(sessionRepository).reset(session.getId());
 
                 oneOf(filterChain).doFilter(request, response);
             }

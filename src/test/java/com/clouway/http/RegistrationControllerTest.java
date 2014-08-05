@@ -64,11 +64,11 @@ public class RegistrationControllerTest {
                 oneOf(userValidator).userIsCorrect(user);
                 will(returnValue(false));
 
-                oneOf(siteMap).registrationForm();
-                will(returnValue("/registration"));
+                oneOf(siteMap).registrationError();
+                will(returnValue("/bank/RegistrationError.html"));
             }
         });
-        assertThat(registrationController.register(),is("/registration"));
+        assertThat(registrationController.register(),is("/bank/RegistrationError.html"));
     }
 
     @Test
@@ -82,10 +82,10 @@ public class RegistrationControllerTest {
                 oneOf(userRepository).exists(user.getUserName());
                 will(returnValue(true));
 
-                oneOf(siteMap).registrationForm();
-                will(returnValue("/registration"));
+                oneOf(siteMap).registrationError();
+                will(returnValue("/bank/RegistrationError.html"));
             }
         });
-        assertThat(registrationController.register(),is("/registration"));
+        assertThat(registrationController.register(),is("/bank/RegistrationError.html"));
     }
 }

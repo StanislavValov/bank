@@ -18,13 +18,13 @@ import java.util.Date;
 public class SecurityFilter implements Filter {
 
     private Provider<Session> currentSessionProvider;
-    private SessionService sessionService;
+    private SessionRepository sessionRepository;
     private SiteMap siteMap;
 
     @Inject
-    public SecurityFilter(Provider<Session> currentSessionProvider, SessionService sessionService, SiteMap siteMap) {
+    public SecurityFilter(Provider<Session> currentSessionProvider, SessionRepository sessionRepository, SiteMap siteMap) {
         this.currentSessionProvider = currentSessionProvider;
-        this.sessionService = sessionService;
+        this.sessionRepository = sessionRepository;
         this.siteMap = siteMap;
     }
 
@@ -48,7 +48,7 @@ public class SecurityFilter implements Filter {
                 response.sendRedirect(siteMap.logoutController());
 
             } else {
-                sessionService.reset(currentSession.getId());
+                sessionRepository.reset(currentSession.getId());
                 filterChain.doFilter(servletRequest, servletResponse);
             }
 

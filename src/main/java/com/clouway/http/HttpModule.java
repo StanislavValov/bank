@@ -26,14 +26,14 @@ public class HttpModule extends ServletModule {
 
     @Provides
     @RequestScoped
-    public Session getCurrentSession(Provider<HttpServletRequest> requestProvider, SessionService sessionService, SiteMap siteMap) {
+    public Session getCurrentSession(Provider<HttpServletRequest> requestProvider, SessionRepository sessionRepository, SiteMap siteMap) {
         Cookie[] cookies = requestProvider.get().getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
 
                 if (cookie.getName().equals(siteMap.sessionCookieName())) {
-                    return sessionService.get(cookie.getValue());
+                    return sessionRepository.get(cookie.getValue());
                 }
             }
         }

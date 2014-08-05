@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
-public interface SessionService {
+public interface SessionRepository {
 
     void remove(String sessionId);
 

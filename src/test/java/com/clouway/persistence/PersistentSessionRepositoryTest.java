@@ -53,7 +53,7 @@ public class PersistentSessionRepositoryTest {
         assertThat(sessionService.get("someId").getExpirationDate(), is(CalendarUtil.sessionExpirationTime()));
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void sessionDoesNotExists() {
         sessionService.remove(session.getId());
         assertNull(sessionService.get(session.getId()));

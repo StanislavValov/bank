@@ -2,9 +2,8 @@ package com.clouway.persistence;
 
 import com.clouway.core.CalendarUtil;
 import com.clouway.core.Session;
-import com.clouway.core.SessionService;
+import com.clouway.core.SessionRepository;
 import com.clouway.core.User;
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -16,7 +15,7 @@ import java.util.Date;
  * Created by hisazzul@gmail.com on 7/11/14.
  */
 @Singleton
-class PersistentSessionRepository implements SessionService {
+class PersistentSessionRepository implements SessionRepository {
 
     Provider<DB> mongoClientProvider;
     DBCollection sessions;

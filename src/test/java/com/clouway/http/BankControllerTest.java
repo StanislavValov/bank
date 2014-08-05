@@ -51,7 +51,7 @@ public class BankControllerTest {
                 oneOf(bankValidator).transactionIsValid(null);
                 will(returnValue(false));
 
-                oneOf(siteMap).transactionErrorLabel();
+                oneOf(siteMap).transactionError();
                 will(returnValue("/bank/TransactionError.html"));
             }
         });

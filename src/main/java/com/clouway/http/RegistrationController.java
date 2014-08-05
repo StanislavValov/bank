@@ -37,7 +37,7 @@ public class RegistrationController {
                 return siteMap.loginForm();
             }
         }
-        return siteMap.registrationForm();
+        return siteMap.registrationError();
     }
 
     public User getUser() {

@@ -1,9 +1,8 @@
 package com.clouway.http;
 
 import com.clouway.core.Session;
-import com.clouway.core.SessionService;
+import com.clouway.core.SessionRepository;
 import com.clouway.core.SiteMap;
-import com.clouway.core.User;
 import com.google.inject.Provider;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -26,13 +25,13 @@ public class LogoutControllerTest {
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
 
-    SessionService sessionService = context.mock(SessionService.class);
+    SessionRepository sessionRepository = context.mock(SessionRepository.class);
     Provider currentUserProvider = context.mock(Provider.class);
     SiteMap siteMap = context.mock(SiteMap.class);
 
     @Before
     public void setUp() throws Exception {
-        logoutController = new LogoutController(currentUserProvider, sessionService, siteMap);
+        logoutController = new LogoutController(currentUserProvider, sessionRepository, siteMap);
         session = new Session("Stanislav","123",new Date());
     }
 
@@ -44,7 +43,7 @@ public class LogoutControllerTest {
                 oneOf(currentUserProvider).get();
                 will(returnValue(session));
 
-                oneOf(sessionService).remove(session.getId());
+                oneOf(sessionRepository).remove(session.getId());
 
                 oneOf(siteMap).loginForm();
                 will(returnValue("/bank/Login.html"));

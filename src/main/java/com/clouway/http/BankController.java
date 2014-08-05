@@ -48,7 +48,7 @@ public class BankController {
             }
 
         } else {
-            return siteMap.transactionErrorLabel();
+            return siteMap.transactionError();
         }
         return siteMap.bankController();
     }

@@ -9,11 +9,15 @@ public interface SiteMap {
 
   String loginForm();
 
-  String transactionErrorLabel();
+  String transactionError();
 
   String registrationForm();
 
   String logoutController();
 
   String bankController();
+
+    String authenticationError();
+
+    String registrationError();
 }

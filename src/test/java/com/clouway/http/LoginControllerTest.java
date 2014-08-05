@@ -27,7 +27,7 @@ public class LoginControllerTest {
     FakeHttpServletResponse response;
 
     AuthorisationService authorisationService = context.mock(AuthorisationService.class);
-    SessionService sessionService = context.mock(SessionService.class);
+    SessionRepository sessionRepository = context.mock(SessionRepository.class);
     SiteMap siteMap = context.mock(SiteMap.class);
     IdGenerator idIdGenerator = context.mock(IdGenerator.class);
 
@@ -36,7 +36,7 @@ public class LoginControllerTest {
         user = new User();
         siteMap = new LabelMap();
         cookie = new Cookie("sid", "someId");
-        loginController = new LoginController(authorisationService, sessionService, siteMap, idIdGenerator);
+        loginController = new LoginController(authorisationService, sessionRepository, siteMap, idIdGenerator);
         loginController.setUser(user);
         response = new FakeHttpServletResponse() {
             @Override
@@ -59,7 +59,7 @@ public class LoginControllerTest {
                 oneOf(idIdGenerator).generateFor(user);
                 will(returnValue("123"));
 
-                oneOf(sessionService).addUser(user, "123");
+                oneOf(sessionRepository).addUser(user, "123");
             }
         });
         assertThat(loginController.authorise(response), is("/bankController"));
@@ -74,6 +74,8 @@ public class LoginControllerTest {
                 will(returnValue(false));
             }
         });
-        assertNull(loginController.authorise(response));
+        assertThat(loginController.authorise(response),is("/bank/AuthenticationError.html"));
     }
+
+
 }

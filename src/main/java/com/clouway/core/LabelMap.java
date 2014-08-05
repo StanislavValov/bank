@@ -17,7 +17,7 @@ public class LabelMap implements SiteMap {
     }
 
     @Override
-    public String transactionErrorLabel() {
+    public String transactionError() {
         return "/bank/TransactionError.html";
     }
 
@@ -34,5 +34,15 @@ public class LabelMap implements SiteMap {
     @Override
     public String bankController() {
         return "/bankController";
+    }
+
+    @Override
+    public String authenticationError(){
+        return "/bank/AuthenticationError.html";
+    }
+
+    @Override
+    public String registrationError(){
+        return "/bank/RegistrationError.html";
     }
 }

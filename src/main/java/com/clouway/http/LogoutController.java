@@ -1,17 +1,13 @@
 package com.clouway.http;
 
 import com.clouway.core.*;
-import com.clouway.core.SessionService;
+import com.clouway.core.SessionRepository;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;
 import com.google.sitebricks.Show;
 import com.google.sitebricks.http.Post;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
@@ -22,13 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 public class LogoutController {
 
     private Provider<Session> currentSession;
-    private SessionService sessionService;
+    private SessionRepository sessionRepository;
     private SiteMap siteMap;
 
     @Inject
-    public LogoutController(Provider<Session> currentSession, SessionService sessionService, SiteMap siteMap) {
+    public LogoutController(Provider<Session> currentSession, SessionRepository sessionRepository, SiteMap siteMap) {
         this.currentSession = currentSession;
-        this.sessionService = sessionService;
+        this.sessionRepository = sessionRepository;
         this.siteMap = siteMap;
     }
 
@@ -37,7 +33,7 @@ public class LogoutController {
 
         Session session = currentSession.get();
 
-        sessionService.remove(session.getId());
+        sessionRepository.remove(session.getId());
 
         return siteMap.loginForm();
     }

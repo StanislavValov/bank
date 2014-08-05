@@ -12,6 +12,10 @@
         $(window).load(function () {
             $('#myModal').modal('show');
         });
+
+        function goBack() {
+            window.history.back()
+        }
     </script>
 
 </head>
@@ -20,12 +24,12 @@
 <div class="modal fade bs-example-modal-sm" id="myModal" style="background-color: antiquewhite">
     <div class="modal-footer">
         <div class="alert alert-danger" role="alert" align="center">
-            Transaction Error
-            <a href="/bankController" class="btn">Close</a>
+            Registration Failed
+            <input type="button" onclick="goBack()" class="btn btn-link" value="Back">
         </div>
     </div>
 </div>
-<iframe src="/bankController" width="100%" height="100%" frameborder="0"></iframe>
+<iframe src="/bank/RegistrationError.html" width="100%" height="100%" frameborder="0"></iframe>
 
 </body>
 </html>
