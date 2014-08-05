@@ -2,72 +2,58 @@ package com.clouway.persistence;
 
 import com.clouway.core.BankService;
 import com.clouway.core.Session;
-import com.clouway.core.User;
-import com.clouway.core.UserNotExistException;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.mongodb.*;
-
-import java.net.UnknownHostException;
 
 /**
  * Created by hisazzul@gmail.com on 7/14/14.
  */
-public class PersistentBankService implements BankService {
+@Singleton
+class PersistentBankService implements BankService {
 
-    private MongoClient mongoClient;
+    private Provider<DB> mongoClientProvider;
     private DBCollection accounts;
     private DB database;
+
+    @Inject
+    public PersistentBankService(Provider<DB> mongoClientProvider) {
+        this.mongoClientProvider = mongoClientProvider;
+    }
 
     @Override
     public void deposit(Session session, String amount) {
 
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            database.requestStart();
-            accounts = database.getCollection("accounts");
+        database = mongoClientProvider.get();
+        database.requestStart();
+        accounts = database.getCollection("accounts");
 
-            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", Double.parseDouble(amount)));
-            accounts.update(new BasicDBObject().append("userName", session.getUserName()), query);
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", Double.parseDouble(amount)));
+        accounts.update(new BasicDBObject().append("userName", session.getUserName()), query);
     }
 
     @Override
     public void withdraw(Session session, String amount) {
 
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            database.requestStart();
-            accounts = database.getCollection("accounts");
+        database = mongoClientProvider.get();
+        database.requestStart();
+        accounts = database.getCollection("accounts");
 
-            BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", -Double.parseDouble(amount)));
-            accounts.update(new BasicDBObject().append("userName", session.getUserName()), query);
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        BasicDBObject query = new BasicDBObject().append("$inc", new BasicDBObject().append("amount", -Double.parseDouble(amount)));
+        accounts.update(new BasicDBObject().append("userName", session.getUserName()), query);
     }
 
     @Override
     public double getAccountAmount(Session session) {
 
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            accounts = database.getCollection("accounts");
+        database = mongoClientProvider.get();
+        accounts = database.getCollection("accounts");
 
-            DBObject query = new BasicDBObject("userName", session.getUserName());
+        DBObject query = new BasicDBObject("userName", session.getUserName());
 
-            DBObject fields = new BasicDBObject("amount",1);
+        DBObject fields = new BasicDBObject("amount",1);
 
-            return Double.parseDouble(String.valueOf(accounts.findOne(query, fields).get("amount")));
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        throw new UserNotExistException();
+        return Double.parseDouble(String.valueOf(accounts.findOne(query, fields).get("amount")));
     }
 }

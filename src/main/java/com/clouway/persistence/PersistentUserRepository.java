@@ -3,6 +3,9 @@ package com.clouway.persistence;
 import com.clouway.core.UserRepository;
 import com.clouway.core.User;
 import com.clouway.core.AuthorisationService;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.mongodb.*;
 
 import java.net.UnknownHostException;
@@ -10,87 +13,64 @@ import java.net.UnknownHostException;
 /**
  * Created by hisazzul@gmail.com on 7/14/14.
  */
+@Singleton
+class PersistentUserRepository implements UserRepository, AuthorisationService {
 
-public class PersistentUserRepository implements UserRepository, AuthorisationService {
-
-    private MongoClient mongoClient;
+    private Provider<DB> mongoClientProvider;
     private DBCollection accounts;
     private DB database;
 
+    @Inject
+    public PersistentUserRepository(Provider<DB> mongoClientProvider) {
+        this.mongoClientProvider = mongoClientProvider;
+    }
+
     @Override
     public boolean exists(String userName) {
-        Boolean userExists = false;
 
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            accounts = database.getCollection("accounts");
+        database = mongoClientProvider.get();
+        accounts = database.getCollection("accounts");
 
-            DBObject users = new BasicDBObject("userName", userName);
-            userExists = accounts.count(users)==1;
+        DBObject users = new BasicDBObject("userName", userName);
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return userExists;
+        return accounts.count(users)==1;
     }
 
     @Override
     public void register(User user) {
 
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            database.requestStart();
-            accounts = database.getCollection("accounts");
+        database = mongoClientProvider.get();
+        database.requestStart();
+        accounts = database.getCollection("accounts");
 
-
-            BasicDBObject doc = new BasicDBObject()
-                    .append("userName", user.getUserName())
-                    .append("password", user.getPassword())
-                    .append("amount", 0);
-            accounts.createIndex(new BasicDBObject("userName", 1), new BasicDBObject("unique", true));
-            accounts.insert(doc);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        BasicDBObject doc = new BasicDBObject()
+                .append("userName", user.getUserName())
+                .append("password", user.getPassword())
+                .append("amount", 0);
+        accounts.createIndex(new BasicDBObject("userName", 1), new BasicDBObject("unique", true));
+        accounts.insert(doc);
     }
 
     @Override
     public boolean isAuthorised(User user) {
 
-        Boolean isAuthorised=false;
+        database = mongoClientProvider.get();
+        accounts = database.getCollection("accounts");
 
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            accounts = database.getCollection("accounts");
+        BasicDBObject query = new BasicDBObject();
 
-            BasicDBObject query = new BasicDBObject();
+        query.append("userName", user.getUserName());
+        query.append("password",user.getPassword());
 
-            query.append("userName", user.getUserName());
-            query.append("password",user.getPassword());
-
-            isAuthorised = accounts.count(query)==1;
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return isAuthorised;
+        return accounts.count(query)==1;
     }
 
     public void delete(String userName) {
-        try {
-            mongoClient = new MongoClient();
-            database = mongoClient.getDB("bank");
-            accounts = database.getCollection("accounts");
+        database = mongoClientProvider.get();
+        accounts = database.getCollection("accounts");
 
-            BasicDBObject query = new BasicDBObject("userName", userName);
+        BasicDBObject query = new BasicDBObject("userName", userName);
 
-            accounts.remove(query);
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        accounts.remove(query);
     }
 }

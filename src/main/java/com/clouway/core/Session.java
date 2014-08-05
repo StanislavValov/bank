@@ -29,4 +29,25 @@ public class Session {
     public String getId() {
         return id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Session session = (Session) o;
+
+        if (!id.equals(session.id)) return false;
+        if (!userName.equals(session.userName)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = userName.hashCode();
+        result = 31 * result + id.hashCode();
+        result = 31 * result + expirationDate.hashCode();
+        return result;
+    }
 }

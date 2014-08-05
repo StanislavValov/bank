@@ -1,6 +1,9 @@
 package com.clouway.persistence;
 
 import com.clouway.core.User;
+import com.google.inject.util.Providers;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,12 +17,16 @@ public class PersistentUserRepositoryTest {
 
     PersistentUserRepository accountService;
     User user;
+    MongoClient mongoClient;
+    DB dataBase;
 
     @Before
     public void setUp() throws Exception {
+        mongoClient = new MongoClient();
+        dataBase = mongoClient.getDB("bankTest");
         user = new User("Stanis;av");
         user.setPassword("123456");
-        accountService = new PersistentUserRepository();
+        accountService = new PersistentUserRepository(Providers.of(dataBase));
         accountService.delete(user.getUserName());
         accountService.register(user);
     }

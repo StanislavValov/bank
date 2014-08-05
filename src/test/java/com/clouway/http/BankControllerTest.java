@@ -46,7 +46,7 @@ public class BankControllerTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(user));
+                will(returnValue(session));
 
                 oneOf(bankValidator).transactionIsValid(null);
                 will(returnValue(false));
@@ -64,7 +64,7 @@ public class BankControllerTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(user));
+                will(returnValue(session));
 
                 oneOf(bankValidator).transactionIsValid(null);
                 will(returnValue(true));
@@ -85,7 +85,7 @@ public class BankControllerTest {
         context.checking(new Expectations() {
             {
                 oneOf(provider).get();
-                will(returnValue(user));
+                will(returnValue(session));
 
                 oneOf(bankValidator).transactionIsValid(null);
                 will(returnValue(true));

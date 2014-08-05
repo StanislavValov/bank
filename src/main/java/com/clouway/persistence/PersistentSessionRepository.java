@@ -16,32 +16,30 @@ import java.util.Date;
  * Created by hisazzul@gmail.com on 7/11/14.
  */
 @Singleton
-public class PersistentSessionRepository implements SessionService {
+class PersistentSessionRepository implements SessionService {
 
-    Provider<MongoClient> mongoClientProvider;
+    Provider<DB> mongoClientProvider;
     DBCollection sessions;
     DB database;
 
     @Inject
-    public PersistentSessionRepository(Provider<MongoClient> mongoClientProvider) {
+    public PersistentSessionRepository(Provider<DB> mongoClientProvider) {
         this.mongoClientProvider = mongoClientProvider;
     }
 
     @Override
     public void remove(String sessionId) {
 
-        database = mongoClientProvider.get().getDB("bank");
+        database = mongoClientProvider.get();
         sessions = database.getCollection("sessions");
-
         BasicDBObject query = new BasicDBObject("sessionId", sessionId);
-
         sessions.remove(query);
     }
 
     @Override
     public Session get(String sessionId) {
 
-        database = mongoClientProvider.get().getDB("bank");
+        database = mongoClientProvider.get();
         sessions = database.getCollection("sessions");
 
         BasicDBObject query = new BasicDBObject("sessionId", sessionId);
@@ -57,13 +55,12 @@ public class PersistentSessionRepository implements SessionService {
         String id = String.valueOf(session.get("sessionId"));
         Date expirationTime = (Date) session.get("expirationTime");
 
-        Optional<Session> optional = Optional.of(new Session(userName, id, expirationTime));
-        return optional.get();
+        return new Session(userName, id, expirationTime);
     }
 
     @Override
     public void reset(String sessionId) {
-        database = mongoClientProvider.get().getDB("bank");
+        database = mongoClientProvider.get();
         sessions = database.getCollection("sessions");
 
         BasicDBObject query = new BasicDBObject()
@@ -79,7 +76,7 @@ public class PersistentSessionRepository implements SessionService {
     @Override
     public void addUser(User user, String sessionId) {
 
-        database = mongoClientProvider.get().getDB("bank");
+        database = mongoClientProvider.get();
         sessions = database.getCollection("sessions");
 
         BasicDBObject doc = new BasicDBObject()
@@ -89,12 +86,5 @@ public class PersistentSessionRepository implements SessionService {
 
         sessions.createIndex(new BasicDBObject("expirationTime", 1), new BasicDBObject("expireAfterSeconds", 0));
         sessions.insert(doc);
-    }
-
-    public void cleanSessionsTable() {
-
-        database = mongoClientProvider.get().getDB("bank");
-        sessions = database.getCollection("sessions");
-        sessions.drop();
     }
 }
