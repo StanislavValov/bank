@@ -1,0 +1,20 @@
+{
+  "name": "angularJSBank",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Remake bank with AngularJS",
+  "main": "Login.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/StanislavValov/angularJSBank.git"
+  },
+  "author": "Stanislav",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StanislavValov/angularJSBank/issues"
+  },
+  "homepage": "https://github.com/StanislavValov/angularJSBank"
+}
