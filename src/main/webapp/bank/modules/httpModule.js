@@ -11,6 +11,7 @@ httpModule.controller('LoginController', ['$scope', '$http',
             password: $scope.password
         };
 
+
         $scope.login = function () {
 
             $http.post('/login', $scope.credentials).
