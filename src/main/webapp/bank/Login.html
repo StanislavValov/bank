@@ -6,9 +6,13 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
+
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
+
+    <script src="modules/httpModule.js"></script>
 
     <link rel="stylesheet" href="ButtonsStyle.css">
 
@@ -32,23 +36,23 @@
 
     </style>
 </head>
-<body style="background-color: antiquewhite">
+<body ng-app="httpModule" style="background-color: antiquewhite">
 <h3 align="center" style="font-family: fantasy">StanBank</h3>
 <hr style="border: inset">
 
 <p></p>
 
-<div class="container-fluid" align="center">
+<div id="qunit" ng-controller="LoginController" class="container-fluid" align="center">
     <div>
         <p></p>
 
-        <form class="form-horizontal" role="form" action="/login" method="post">
+        <form class="form-horizontal" role="form" method="post">
             <div class="form-group" style="width: 50%">
                 <label for="inputUserName" class="col-md-2 control-label"></label>
 
                 <div class="input-group">
                     <input type="text" class="form-control" id="inputUserName" placeholder="Username"
-                           name="user.userName">
+                            data-ng-model="credentials.userName">
                     <span class="input-group-addon glyphicon glyphicon-user"></span>
                 </div>
             </div>
@@ -57,7 +61,7 @@
 
                 <div class="input-group">
                     <input type="password" class="form-control" id="inputPassword" placeholder="Password"
-                           name="user.password">
+                            data-ng-model="credentials.password">
                     <span class="input-group-addon glyphicon glyphicon-lock"></span>
                 </div>
             </div>
@@ -65,9 +69,9 @@
             <div class="row" style="width: 80%">
                 <div>
                     <div class="col-md-6 col-md-offset-1">
-                        <button type="submit" class="btn btn-primary btn3d" id="login">Sign in</button>
+                        <button ng-click="login()" type="button" class="btn btn-primary btn3d" id="login">Sign in</button>
                     </div>
-                    <div class="col-md-1 col-md-offset-1"><a href="/bank/RegistrationForm.html"
+                    <div class="col-md-1 col-md-offset-1"><a href="RegistrationForm.html"
                                                              class="btn btn-default btn3d">Registration</a>
                     </div>
                 </div>

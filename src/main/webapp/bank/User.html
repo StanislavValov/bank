@@ -1,4 +1,4 @@
-<html>
+<html ng-app="httpModule">
 <head>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
@@ -6,7 +6,13 @@
 
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
+
+    <script src="modules/httpModule.js"></script>
+
     <link type="text/css" href="UserStyle.css" rel="stylesheet">
+
+
     <style>
 
         #deposit {
@@ -23,28 +29,31 @@
 <div align="center">
     <span class="glyphicon glyphicon-user"></span>
 </div>
-<div class="container" align="center" style="background-color: aliceblue">
+<div ng-controller="BankController" class="container" align="center" style="background-color: aliceblue">
     <div align="right">
-        <form method="post" action="/logout">
-            <input type="submit" name="logout" class="btn btn-primary" value="Logout">
+        <form method="post">
+            <input ng-controller="LogoutController" ng-click="logout()" type="submit" name="logout" class="btn btn-primary" value="Logout" id="logout">
         </form>
     </div>
-    Current Amount: ${getUserAccountAmount()} $
-    <Form method="post" action="/bankController">
+
+    {{currentAmount}} $
+
+    <Form  method="post">
         <p></p>
 
         <div class="btn-group btn-group-xs">
+
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="enter amount" name="account.transactionAmount">
+                <input type="text" class="form-control" placeholder="enter amount" data-ng-model="account.transactionAmount">
                 <span class="input-group-addon glyphicon glyphicon-usd"></span>
             </div>
             <p></p>
 
             <div>
-                <input type="submit" name="account.deposit" class="btn btn-default btn-xs" value="Deposit"
+                <input type="button" ng-click="deposit()" class="btn btn-default btn-xs" value="Deposit"
                        style="font-style: italic" id="deposit">
 
-                <input type="submit" name="account.withdraw" class="btn btn-default btn-xs" value="Withdraw"
+                <input type="button" ng-click="withdraw()" class="btn btn-default btn-xs" value="Withdraw"
                        id="withdraw" style="font-style: italic">
             </div>
         </div>

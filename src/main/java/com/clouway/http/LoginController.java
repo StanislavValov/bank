@@ -4,7 +4,10 @@ import com.clouway.core.*;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;
-import com.google.sitebricks.Show;
+import com.google.sitebricks.client.transport.Json;
+import com.google.sitebricks.headless.Reply;
+import com.google.sitebricks.headless.Request;
+import com.google.sitebricks.headless.Service;
 import com.google.sitebricks.http.Post;
 
 import javax.servlet.http.Cookie;
@@ -14,44 +17,36 @@ import javax.servlet.http.HttpServletResponse;
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @At("/login")
-@Show("/bank/Login.html")
+@Service
 @Singleton
 public class LoginController {
 
     private AuthorisationService authorisationService;
     private SessionRepository sessionRepository;
-    private SiteMap siteMap;
     private IdGenerator idGenerator;
-    private User user = new User();
-
+    private SiteMap siteMap;
 
     @Inject
-    public LoginController(AuthorisationService authorisationService, SessionRepository sessionRepository, SiteMap siteMap, IdGenerator idGenerator) {
+    public LoginController(AuthorisationService authorisationService, SessionRepository sessionRepository, IdGenerator idGenerator, SiteMap siteMap) {
         this.authorisationService = authorisationService;
         this.sessionRepository = sessionRepository;
-        this.siteMap = siteMap;
         this.idGenerator = idGenerator;
+        this.siteMap = siteMap;
     }
 
     @Post
-    public String authorise(HttpServletResponse response) {
+    public Reply<?> authorise(Request request, HttpServletResponse response) {
+
+        User user = request.read(User.class).as(Json.class);
 
         if (!authorisationService.isAuthorised(user)) {
-            return siteMap.authenticationError();
+            return Reply.saying().error();
         }
 
         String sessionId = idGenerator.generateFor(user);
-
         response.addCookie(new Cookie(siteMap.sessionCookieName(), sessionId));
         sessionRepository.addUser(user, sessionId);
-        return siteMap.bankController();
-    }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+        return Reply.saying().ok();
     }
 }

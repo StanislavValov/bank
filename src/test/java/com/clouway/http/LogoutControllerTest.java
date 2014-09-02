@@ -31,7 +31,7 @@ public class LogoutControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        logoutController = new LogoutController(currentUserProvider, sessionRepository, siteMap);
+        logoutController = new LogoutController(currentUserProvider, sessionRepository);
         session = new Session("Stanislav","123",new Date());
     }
 

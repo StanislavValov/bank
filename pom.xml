@@ -2,10 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>java.clouway</groupId>
-    <artifactId>Task15.1</artifactId>
+    <artifactId>angularBank</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>Task15.1 Maven Webapp</name>
+    <name>angularBank Maven Webapp</name>
     <url>http://maven.apache.org</url>
     <dependencies>
 
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>com.google.sitebricks</groupId>
             <artifactId>sitebricks</artifactId>
-            <version>0.8.9</version>
+            <version>0.8.8</version>
         </dependency>
 
         <dependency>
@@ -107,13 +107,6 @@
             <version>1.6.2</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>angularjs</artifactId>
-            <version>1.3.0-beta.13</version>
-        </dependency>
-
-
     </dependencies>
 
     <build>
@@ -127,10 +120,12 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
-            </plugin>            <plugin>
+            </plugin>
+
+            <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.9</version>
+                <version>7.0.0.pre5</version>
             </plugin>
 
             <plugin>
@@ -142,8 +137,9 @@
                 </configuration>
             </plugin>
 
+
         </plugins>
-        <finalName>Task15.1</finalName>
+        <finalName>angularBank</finalName>
     </build>
 
 </project>

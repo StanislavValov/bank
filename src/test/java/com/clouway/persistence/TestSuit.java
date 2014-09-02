@@ -8,9 +8,9 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        PersistentBankServiceTest.class,
-        PersistentSessionRepositoryTest.class,
-        PersistentUserRepositoryTest.class
+//        PersistentBankServiceTest.class,
+//        PersistentSessionRepositoryTest.class,
+//        PersistentUserRepositoryTest.class
 })
 
 public class TestSuit {

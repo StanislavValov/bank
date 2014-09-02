@@ -10,10 +10,10 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         BankControllerTest.class,
-        LoginControllerTest.class,
-        RegistrationControllerTest.class,
+//        LoginControllerTest.class,
+//        RegistrationControllerTest.class,
         LogoutControllerTest.class,
-        SecurityFilterTest.class
+//        SecurityFilterTest.class
 })
 public class TestSuite {
 }

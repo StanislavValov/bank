@@ -1,4 +1,4 @@
-<html>
+<html ng-app="httpModule">
 
 <head>
 
@@ -10,6 +10,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
+
+    <script src="modules/httpModule.js"></script>
 
     <script>
         $(window).load(function () {
@@ -24,7 +28,7 @@
     <div class="modal-footer">
         <div class="alert alert-danger" role="alert" align="center">
             Wrong username or password
-            <a href="/login" class="btn">Close</a>
+            <a href="/bank/Login.html" class="btn">Close</a>
         </div>
     </div>
 </div>

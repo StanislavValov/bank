@@ -6,62 +6,67 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.sitebricks.At;
 import com.google.sitebricks.Show;
+import com.google.sitebricks.client.transport.Json;
+import com.google.sitebricks.headless.Reply;
+import com.google.sitebricks.headless.Request;
+import com.google.sitebricks.headless.Service;
+import com.google.sitebricks.http.Get;
 import com.google.sitebricks.http.Post;
+import com.google.sitebricks.http.Put;
 
 /**
  * Created by Stanislav Valov <hisazzul@gmail.com>
  */
 @At("/bankController")
-@Show("/bank/User.html")
+@Service
 @Singleton
 public class BankController {
 
     private BankService bankService;
     private BankValidator validator;
     private Provider<Session> currentSessionProvider;
-    private SiteMap siteMap;
-    private Account account = new Account();
 
     @Inject
-    public BankController(BankService bankService, BankValidator validator, Provider<Session> currentSessionProvider, SiteMap siteMap) {
+    public BankController(BankService bankService, BankValidator validator, Provider<Session> currentSessionProvider) {
         this.bankService = bankService;
         this.validator = validator;
         this.currentSessionProvider = currentSessionProvider;
-        this.siteMap = siteMap;
     }
 
     @Post
-    public String accountOperation() {
+    public Reply<?> deposit(Request request) {
 
-        Session currentSession= currentSessionProvider.get();
+        Account account = request.read(Account.class).as(Json.class);
+        Session currentSession = currentSessionProvider.get();
 
         if (validator.transactionIsValid(account.getTransactionAmount())) {
 
-            if (account.getDeposit() != null) {
-                account.setDeposit(null);
-                bankService.deposit(currentSession, account.getTransactionAmount());
-            }
-
-            if (account.getWithdraw() != null) {
-                account.setWithdraw(null);
-                bankService.withdraw(currentSession, account.getTransactionAmount());
-            }
+            bankService.deposit(currentSession, account.getTransactionAmount());
 
         } else {
-            return siteMap.transactionError();
+            return Reply.saying().error();
         }
-        return siteMap.bankController();
+        return Reply.with(getUserAccountAmount());
     }
 
-    public double getUserAccountAmount() {
-        return bankService.getAccountAmount(currentSessionProvider.get());
+    @Put
+    public Reply<?> withdraw(Request request){
+
+        Account account = request.read(Account.class).as(Json.class);
+        Session currentSession = currentSessionProvider.get();
+
+        if (validator.transactionIsValid(account.getTransactionAmount())) {
+
+            bankService.withdraw(currentSession, account.getTransactionAmount());
+
+        } else {
+            return Reply.saying().error();
+        }
+        return Reply.with(getUserAccountAmount());
     }
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
+    @Get
+    public Reply<?> getUserAccountAmount() {
+        return Reply.with(bankService.getAccountAmount(currentSessionProvider.get()));
     }
 }

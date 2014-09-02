@@ -8,6 +8,10 @@
     <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
+
+    <script src="modules/httpModule.js"></script>
+
     <script>
         $(window).load(function () {
             $('#myModal').modal('show');
@@ -21,11 +25,11 @@
     <div class="modal-footer">
         <div class="alert alert-danger" role="alert" align="center">
             Transaction Error
-            <a href="/bankController" class="btn">Close</a>
+            <a href="/bank/User.html" class="btn" id="close">Close</a>
         </div>
     </div>
 </div>
-<iframe src="/bankController" width="100%" height="100%" frameborder="0"></iframe>
+<iframe src="/bank/User.html" width="100%" height="100%" frameborder="0"></iframe>
 
 </body>
 </html>
