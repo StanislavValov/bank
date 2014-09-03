@@ -1,7 +1,7 @@
-var httpModule = angular.module('httpModule', []);
+var httpModule = angular.module('httpModule', ['ui.router']);
 
-httpModule.controller('LoginController', ['$scope', '$http',
-    function ($scope, $http) {
+httpModule.controller('LoginController', ['$scope', '$http', '$state',
+    function ($scope, $http, $state) {
 
         $scope.userName = '';
         $scope.password = '';
@@ -16,10 +16,10 @@ httpModule.controller('LoginController', ['$scope', '$http',
 
             $http.post('/login', $scope.credentials).
                 success(function () {
-                    window.location.href = 'User.html';
+                    $state.go('user');
                 }).
                 error(function () {
-                    window.location.href = 'AuthenticationError.html';
+                    $state.go('login');
                 });
         };
     }]);
@@ -30,14 +30,14 @@ httpModule.controller('BankController', ['$scope', '$http', function ($scope, $h
     $scope.currentAmount = '';
 
     $scope.account = {
-      transactionAmount: $scope.transactionAmount
+        transactionAmount: $scope.transactionAmount
     };
 
     $scope.deposit = function () {
 
         $http.post('/bankController', $scope.account).
             success(function () {
-                window.location.reload();
+//                window.location.reload();
             }).
             error(function () {
                 window.location.href = 'TransactionError.html';
@@ -45,13 +45,13 @@ httpModule.controller('BankController', ['$scope', '$http', function ($scope, $h
     };
 
     $scope.withdraw = function () {
-      $http.put('/bankController', $scope.account).
-          success(function () {
-              window.location.reload();
-          }).
-          error(function () {
-              window.location.href = 'TransactionError.html';
-          });
+        $http.put('/bankController', $scope.account).
+            success(function () {
+//                window.location.reload();
+            }).
+            error(function () {
+                window.location.href = 'TransactionError.html';
+            });
     };
 
     $scope.$watch($scope.transactionAmount, function () {
@@ -72,16 +72,43 @@ httpModule.controller('LogoutController', ['$scope', '$http', function ($scope, 
     };
 }]);
 
-httpModule.controller('RegistrationController', ['$scope', '$http', function ($scope, $http) {
+httpModule.controller('RegistrationController', ['$scope', '$http', '$state', function ($scope, $http, $state) {
 
     $scope.register = function () {
 
         $http.jsonp('/registration', $scope.credentials).
             success(function () {
-                window.location.href = 'Login.html';
+                $state.go('registration');
             }).
             error(function () {
                 window.location.href = 'RegistrationError.html';
             });
     };
 }]);
+
+httpModule.config(function ($stateProvider) {
+
+    $stateProvider.state("user", {
+        url: '/user',
+        views: {
+            'user@user': { templateUrl: 'Login.html',
+                controller: 'LoginController'}
+        }
+    }).state("login", {
+        url: '/error',
+        views: {
+            '': {templateUrl: 'Login.html',
+                template: 'Wrong username or password'},
+            'error@login': {
+//                controller: 'LoginController',
+
+            }
+        }
+    }).state("registration", {
+        url: '/registration',
+        views: {
+//            '': {templateUrl: 'Login.html'},
+            '': {templateUrl: 'RegistrationForm.html'}
+        }
+    })
+});

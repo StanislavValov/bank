@@ -1,50 +1,41 @@
-<html ng-app="httpModule">
-<head>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
-
-    <script src="modules/httpModule.js"></script>
-
-    <link type="text/css" href="UserStyle.css" rel="stylesheet">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="RegFormStyle.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+<link href="css/bootstrap.min.css" rel="stylesheet">
 
 
-    <style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
-        #deposit {
-            float: left
-        }
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
+<style>
+    #deposit {
+        float: left
+    }
 
-        #withdraw {
-            float: right
-        }
-    </style>
-    <title></title>
-</head>
-<body style="background-color: antiquewhite">
-<div align="center">
-    <span class="glyphicon glyphicon-user"></span>
-</div>
-<div ng-controller="BankController" class="container" align="center" style="background-color: aliceblue">
+    #withdraw {
+        float: right
+    }
+</style>
+
+<div ng-controller="BankController" class="container"
+     style="background-color: aliceblue">
     <div align="right">
-        <form method="post">
-            <input ng-controller="LogoutController" ng-click="logout()" type="submit" name="logout" class="btn btn-primary" value="Logout" id="logout">
-        </form>
+        <input ng-controller="LogoutController" ng-click="logout()" type="button" name="logout"
+               class="btn btn-primary" value="Logout" id="logout">
     </div>
 
     {{currentAmount}} $
 
-    <Form  method="post">
+    <Form>
         <p></p>
 
         <div class="btn-group btn-group-xs">
 
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="enter amount" data-ng-model="account.transactionAmount">
+                <input type="text" class="form-control" placeholder="enter amount"
+                       data-ng-model="account.transactionAmount">
                 <span class="input-group-addon glyphicon glyphicon-usd"></span>
             </div>
             <p></p>
@@ -53,12 +44,10 @@
                 <input type="button" ng-click="deposit()" class="btn btn-default btn-xs" value="Deposit"
                        style="font-style: italic" id="deposit">
 
-                <input type="button" ng-click="withdraw()" class="btn btn-default btn-xs" value="Withdraw"
+                <input type="button" ng-click="withdraw()" class="btn btn-default btn-xs"
+                       value="Withdraw"
                        id="withdraw" style="font-style: italic">
             </div>
         </div>
     </Form>
 </div>
-
-</body>
-</html>
