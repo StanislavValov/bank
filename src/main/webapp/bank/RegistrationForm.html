@@ -1,24 +1,17 @@
-<html ng-app="httpModule">
-<head>
     <link rel="stylesheet" href="RegFormStyle.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">-->
+    <!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">-->
 
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <!--<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>-->
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
-
-    <script src="modules/httpModule.js"></script>
-
-    <title>BankRegistration</title>
-</head>
-<h1 align="center">
-    <small>Registration</small>
-</h1>
-<body ui-view style="background-color: antiquewhite">
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>-->
 
 
 <div ng-controller="RegistrationController" class="container" align="center">
+    <h1 align="center">
+        <small>Registration</small>
+    </h1>
+    <p style="color: red">{{registrationError}}</p>
     <p></p>
 
     <form class="col-md-12 go-right">
@@ -45,6 +38,3 @@
     </form>
     <p></p>
 </div>
-
-</body>
-</html>

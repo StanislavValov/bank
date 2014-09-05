@@ -46,7 +46,7 @@ public class BankController {
         } else {
             return Reply.saying().error();
         }
-        return Reply.with(getUserAccountAmount());
+        return Reply.with(bankService.getAccountAmount(currentSessionProvider.get()));
     }
 
     @Put
@@ -62,7 +62,7 @@ public class BankController {
         } else {
             return Reply.saying().error();
         }
-        return Reply.with(getUserAccountAmount());
+        return Reply.with(bankService.getAccountAmount(currentSessionProvider.get()));
     }
 
     @Get
