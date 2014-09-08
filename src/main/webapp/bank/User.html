@@ -1,4 +1,3 @@
-
 <style>
     #deposit {
         float: left
@@ -11,12 +10,12 @@
 
 <div ng-controller="BankController" class="container"
      style="background-color: aliceblue">
-
     <div align="right">
         <input ng-controller="LogoutController" ng-click="logout()" type="button" name="logout"
                class="btn btn-primary" value="Logout" id="logout">
     </div>
-    <span style="color: red">{{transactionError}}</span>
+    
+        <span style="color: red">{{transactionError}}</span>
     <div align="center">
         <span class="glyphicon glyphicon-user"></span>
     </div>
@@ -32,7 +31,6 @@
                        data-ng-model="account.transactionAmount">
                 <span class="input-group-addon glyphicon glyphicon-usd"></span>
             </div>
-
             <p></p>
 
             <div>

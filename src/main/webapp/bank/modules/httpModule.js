@@ -37,8 +37,6 @@ httpModule.controller('BankController', ['$scope', '$http', function ($scope, $h
             $scope.currentAmount = result;
         });
 
-
-    $scope.deposit = function () {
         $http.post('/bankController', $scope.account).
             success(function (result) {
                 $scope.currentAmount = result;
