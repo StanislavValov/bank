@@ -1,37 +1,25 @@
-<html ng-app="httpModule">
-<head>
-    <link rel="stylesheet" href="RegFormStyle.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
-
-    <script src="modules/httpModule.js"></script>
-
-    <title>BankRegistration</title>
-</head>
-<h1 align="center">
-    <small>Registration</small>
-</h1>
-<body ui-view style="background-color: antiquewhite">
-
 
 <div ng-controller="RegistrationController" class="container" align="center">
+    <h1 align="center">
+        <small>Registration</small>
+    </h1>
+    <p style="color: red">{{registrationError}}</p>
+
     <p></p>
 
     <form class="col-md-12 go-right">
         <div class="form-group" style="width: 50%">
             <div class="input-group">
-                <input data-ng-model="credentials.userName" type="text" class="form-control" id="inputUserName" placeholder="Username">
+                <input data-ng-model="credentials.userName" type="text" class="form-control" id="inputUserName"
+                       placeholder="Username">
                 <label for="inputUserName">From 5 to 15 letters</label>
                 <span class="input-group-addon glyphicon glyphicon-user"></span>
             </div>
         </div>
         <div class="form-group" style="width: 50%">
             <div class="input-group">
-                <input data-ng-model="credentials.password" type="password" class="form-control" id="inputPassword" placeholder="Password">
+                <input data-ng-model="credentials.password" type="password" class="form-control" id="inputPassword"
+                       placeholder="Password">
                 <label for="inputPassword">From 6 to 18 letters or digits</label>
                 <span class="input-group-addon glyphicon glyphicon-lock"></span>
             </div>
@@ -45,6 +33,3 @@
     </form>
     <p></p>
 </div>
-
-</body>
-</html>

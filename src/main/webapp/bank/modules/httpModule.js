@@ -11,7 +11,6 @@ httpModule.controller('LoginController', ['$scope', '$http', '$state',
             password: $scope.password
         };
 
-
         $scope.login = function () {
 
             $http.post('/login', $scope.credentials).
@@ -33,33 +32,33 @@ httpModule.controller('BankController', ['$scope', '$http', function ($scope, $h
         transactionAmount: $scope.transactionAmount
     };
 
-    $scope.deposit = function () {
+    $http.get('/bankController').
+        success(function (result) {
+            $scope.currentAmount = result;
+        });
 
+
+    $scope.deposit = function () {
         $http.post('/bankController', $scope.account).
-            success(function () {
-//                window.location.reload();
+            success(function (result) {
+                $scope.currentAmount = result;
+                $scope.transactionError = '';
             }).
             error(function () {
-                window.location.href = 'TransactionError.html';
+                $scope.transactionError = 'Transaction Error';
             });
     };
 
     $scope.withdraw = function () {
         $http.put('/bankController', $scope.account).
-            success(function () {
-//                window.location.reload();
-            }).
-            error(function () {
-                window.location.href = 'TransactionError.html';
-            });
-    };
-
-    $scope.$watch($scope.transactionAmount, function () {
-        $http.get('/bankController').
             success(function (result) {
                 $scope.currentAmount = result;
+                $scope.transactionError = '';
+            }).
+            error(function () {
+                $scope.transactionError = 'Transaction Error';
             });
-    });
+    };
 }]);
 
 httpModule.controller('LogoutController', ['$scope', '$http', function ($scope, $http) {
@@ -67,48 +66,54 @@ httpModule.controller('LogoutController', ['$scope', '$http', function ($scope, 
     $scope.logout = function () {
         $http.post('/logout', '').
             success(function () {
-                window.location.href = 'Login.html';
+                window.location.href = 'Index.html';
             });
     };
 }]);
 
 httpModule.controller('RegistrationController', ['$scope', '$http', '$state', function ($scope, $http, $state) {
 
+    $scope.userName = '';
+    $scope.password = '';
+
+    $scope.credentials = {
+        userName: $scope.userName,
+        password: $scope.password
+    };
     $scope.register = function () {
 
-        $http.jsonp('/registration', $scope.credentials).
+        $http.post('/registration', $scope.credentials).
             success(function () {
-                $state.go('registration');
+                window.location.href = 'Index.html';
             }).
             error(function () {
-                window.location.href = 'RegistrationError.html';
+                $scope.registrationError = 'Registration failed';
+                $state.go('registration')
             });
     };
 }]);
 
+
 httpModule.config(function ($stateProvider) {
 
-    $stateProvider.state("user", {
-        url: '/user',
-        views: {
-            'user@user': { templateUrl: 'Login.html',
-                controller: 'LoginController'}
-        }
-    }).state("login", {
-        url: '/error',
-        views: {
-            '': {templateUrl: 'Login.html',
-                template: 'Wrong username or password'},
-            'error@login': {
-//                controller: 'LoginController',
+    $stateProvider
+        .state("user", {
+            url: '/user',
+            views: {
+                '': { templateUrl: 'User.html'}
 
             }
-        }
-    }).state("registration", {
-        url: '/registration',
-        views: {
-//            '': {templateUrl: 'Login.html'},
-            '': {templateUrl: 'RegistrationForm.html'}
-        }
-    })
+        }).state("login", {
+            url: '/error',
+            views: {
+                '': {templateUrl: 'Login.html',
+                    template: 'Wrong username or password'}
+            }
+
+        }).state("registration", {
+            url: '/registration',
+            views: {
+                '': {templateUrl: 'RegistrationForm.html'}
+            }
+        });
 });

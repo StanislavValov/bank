@@ -1,0 +1,94 @@
+<html ng-app="httpModule">
+
+<head>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="RegFormStyle.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.0.7/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
+    <script src="modules/httpModule.js"></script>
+
+    <!--<link rel="stylesheet" href="LoginStyle.css">-->
+    <link rel="stylesheet" href="RegFormStyle.css">
+
+    <title>StanBank</title>
+
+    <style>
+        .btn3d {
+            position: relative;
+            border: 0;
+            border-radius: 3px;
+            margin: 15px 10px 0 0;
+            transition: all .09s linear;
+            box-shadow: 0 0 0 2px rgba(50, 200, 200, 0.15) inset, 6px 6px 0 0 #ccc, 6px 6px 0 1px rgba(0, 0, 0, 0.2), 6px 6px 3px 0px rgba(0, 0, 0, 0.3);
+            outline: medium none;
+        }
+
+        h3 {
+            font-style: italic;
+
+        }
+    </style>
+</head>
+<body  style="background-color: antiquewhite">
+
+<div ng-controller="LoginController" class="container-fluid" align="center">
+    <h3 align="center" style="font-family: fantasy">StanBank</h3>
+    <hr style="border: inset">
+
+    <div>
+        <p></p>
+
+        <form class="form-horizontal">
+            <div class="form-group" style="width: 50%">
+                <label for="username" class="col-md-2 control-label"></label>
+
+                <div class="input-group">
+                    <input type="text" class="form-control" id="username" placeholder="Username"
+                           data-ng-model="credentials.userName">
+                    <span class="input-group-addon glyphicon glyphicon-user"></span>
+                </div>
+            </div>
+            <div class="form-group" style="width: 50%">
+                <label for="password" class="col-md-2 control-label"></label>
+
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" placeholder="Password"
+                           data-ng-model="credentials.password">
+                    <span class="input-group-addon glyphicon glyphicon-lock"></span>
+                </div>
+            </div>
+
+            <div class="row" style="width: 80%">
+                <div>
+                    <div class="col-md-6 col-md-offset-1">
+
+                        <input ng-click="login()" type="button" class="btn btn-primary btn3d" id="login"
+                               value="Sign in" data-toggle="modal" data-target=".bs-example-modal-lg">
+
+                    </div>
+                    <div class="col-md-1 col-md-offset-1">
+                        <a ui-sref="registration" class="btn btn-default btn3d" type="button"
+                               data-toggle="modal" data-target=".bs-example-modal-lg">Registration</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <p></p>
+    </div>
+</div>
+
+<div align="center" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+     aria-labelledby="mySmallModalLabel" aria-hidden="false">
+    <div class="modal-dialog modal-lg">
+        <div align="center" ui-view class="modal-content"></div>
+    </div>
+</div>
+</body>
+</html>
